@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ArrowLeft, FolderPlus, Folder, MessageSquare, Trash2, Move } from 'lucide-react';
 import { ChatFolder, ChatHistoryViewerProps} from '../types/chat';
 
-
 const ChatHistoryViewer = ({ 
   onBack, 
   chatSessions, 
@@ -24,28 +23,14 @@ const ChatHistoryViewer = ({
 
   const folderColors = [
     'bg-blue-100 text-blue-800 border-blue-200',
-    'bg-green-100 text-green-800 border-green-200',
-    'bg-purple-100 text-purple-800 border-purple-200',
-    'bg-orange-100 text-orange-800 border-orange-200',
-    'bg-pink-100 text-pink-800 border-pink-200',
-    'bg-indigo-100 text-indigo-800 border-indigo-200'
+    'bg-sky-100 text-sky-800 border-sky-200',
+    'bg-cyan-100 text-cyan-800 border-cyan-200',
+    'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'bg-blue-200 text-blue-900 border-blue-300',
+    'bg-sky-200 text-sky-900 border-sky-300'
   ];
-
-  const formatDate = (date: Date) => {
-    const now = new Date();
-    const diffInHours = Math.abs(now.getTime() - date.getTime()) / 36e5;
-    
-    if (diffInHours < 1) {
-      return "Nu";
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)} uur geleden`;
-    } else if (diffInHours < 48) {
-      return "Gisteren";
-    } else {
-      const days = Math.floor(diffInHours / 24);
-      return `${days} dagen geleden`;
-    }
-  };
+  
+  // De formatDate functie is verwijderd uit deze component
 
   const createFolder = () => {
     if (newFolderName.trim()) {
@@ -258,7 +243,7 @@ const ChatHistoryViewer = ({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (confirm(`Map "${folder.name}" verwijderen? Chats worden teruggezet naar "Alle Chats".`)) {
+                    if (confirm(`Map "${folder.name}" verwijderen? Chats worden teruggezet naar "Algemene chats".`)) {
                       deleteFolder(folder.id);
                     }
                   }}
@@ -271,7 +256,7 @@ const ChatHistoryViewer = ({
 
             {/* Create folder form */}
             {isCreatingFolder && (
-              <div className="p-3 border border-gray-300 rounded-lg bg-gray-50">
+              <div className="p-3 border border-gray-300 rounded-lg shadow">
                 <input
                   type="text"
                   placeholder="Map naam..."
@@ -309,8 +294,8 @@ const ChatHistoryViewer = ({
             
             {/* Drag instruction */}
             {draggedChatId !== null && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-700">
+              <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <p className="text-sm text-purple-700">
                   Sleep naar een map om de chat te verplaatsen
                 </p>
               </div>
@@ -322,7 +307,7 @@ const ChatHistoryViewer = ({
         <div className="flex-1 overflow-y-auto">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="md:text-lg font-semibold text-gray-900">
                 {selectedFolderData ? selectedFolderData.name : 'Algemene Chats'}
               </h2>
               <p className="text-sm text-gray-500">

@@ -23,14 +23,14 @@ const DocumentViewer = ({
   const [dragOverFolderId, setDragOverFolderId] = useState<number | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
-
+  
   const folderColors = [
     'bg-blue-100 text-blue-800 border-blue-200',
-    'bg-green-100 text-green-800 border-green-200',
-    'bg-purple-100 text-purple-800 border-purple-200',
-    'bg-orange-100 text-orange-800 border-orange-200',
-    'bg-pink-100 text-pink-800 border-pink-200',
-    'bg-indigo-100 text-indigo-800 border-indigo-200'
+    'bg-sky-100 text-sky-800 border-sky-200',
+    'bg-cyan-100 text-cyan-800 border-cyan-200',
+    'bg-indigo-100 text-indigo-800 border-indigo-200',
+    'bg-blue-200 text-blue-900 border-blue-300',
+    'bg-sky-200 text-sky-900 border-sky-300'
   ];
 
   const formatDate = (date: Date) => {
@@ -64,12 +64,19 @@ const DocumentViewer = ({
   };
 
   const deleteFolder = (folderId: number) => {
+    // 1. Verwijder de map uit de lijst van alle mappen
+    onUpdateFolders(folders.filter(f => f.id !== folderId));
+    
+    // 2. Verwijder de map ook uit de lijst van actieve contextmappen
+    onUpdateActiveContext(activeContextFolders.filter(f => f.id !== folderId));
+
+    // 3. Verplaats de documenten terug naar de algemene map
     const updatedDocuments = documents.map(doc => 
       doc.folderId === folderId ? { ...doc, folderId: undefined } : doc
     );
     onUpdateDocuments(updatedDocuments);
-    onUpdateFolders(folders.filter(f => f.id !== folderId));
     
+    // 4. Reset de geselecteerde map als dat de verwijderde map was
     if (selectedFolder === folderId) {
       setSelectedFolder(null);
     }
@@ -161,7 +168,6 @@ const DocumentViewer = ({
     );
   };
   
-  // FUNCTIE OM MAP AAN/UIT TE ZETTEN ALS ACTIEVE CONTEXT
   const toggleActiveContext = (folder: DocumentFolder | null) => {
     if (folder === null) {
       // Algemene documenten zijn altijd actief en kunnen niet worden uitgeschakeld.
@@ -374,7 +380,7 @@ const DocumentViewer = ({
 
             {/* Create folder form */}
             {isCreatingFolder && (
-              <div className="p-3 border border-gray-300 rounded-lg bg-gray-50">
+              <div className="p-3 border border-gray-300 rounded-lg shadow">
                 <input
                   type="text"
                   placeholder="Map naam..."
@@ -412,8 +418,8 @@ const DocumentViewer = ({
             
             {/* Drag instruction */}
             {draggedDocumentId !== null && (
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-700">
+              <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <p className="text-sm text-purple-700">
                   Sleep naar een map om het document te verplaatsen
                 </p>
               </div>

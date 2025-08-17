@@ -5,6 +5,16 @@ export interface Message {
   timestamp: Date;
 }
 
+export interface Document {
+  id: number;
+  name: string;
+  type: string;
+  size: string;
+  uploadedAt: Date;
+  content?: string;
+  folderId?: number;
+}
+
 export interface ChatSession {
   id: number;
   title: string;
@@ -49,6 +59,10 @@ export interface ChatInterfaceProps {
   onSendMessage: (message: Message) => void;
   onToggleSidebar: () => void;
   isSidebarOpen: boolean;
+  onUploadDocument: (doc: Document) => void;
+  activeChatId: number | null;
+  onRemoveDocument: (documentId: number) => void;
+  isLoading: boolean; 
 }
 
 export interface ChatHistoryViewerProps {
@@ -59,17 +73,6 @@ export interface ChatHistoryViewerProps {
   onUpdateFolders: (folders: ChatFolder[]) => void;
   folders: ChatFolder[];
   onDeleteChat: (chatId: number) => void;
-}
-
-
-export interface Document {
-  id: number;
-  name: string;
-  type: string;
-  size: string;
-  uploadedAt: Date;
-  content?: string;
-  folderId?: number;
 }
 
 export interface DocumentViewerProps {

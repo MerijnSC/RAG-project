@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import ChatInterface from '../components/ChatInterface';
 import DocumentViewer from '../components/DocumentViewer';
@@ -13,23 +13,80 @@ const DashboardPage = () => {
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]); 
   const [chatFolders, setChatFolders] = useState<ChatFolder[]>([]);
   const [currentActiveFolder, setCurrentActiveFolder] = useState<number | null>(null);
-  const [currentChat, setCurrentChat] = useState<Message[]>([
-    {
-      id: 1,
-      type: 'bot',
-      content: 'Hallo! Ik ben je AI assistent. Hoe kan ik je vandaag helpen?',
-      timestamp: new Date()
-    }
-  ]);
+  const [currentChat, setCurrentChat] = useState<Message[]>([ ]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('chat');
-
   const [documents, setDocuments] = useState<Document[]>([]);
   const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([]);
-
   const [activeContextFolders, setActiveContextFolders] = useState<DocumentFolder[]>([
     { id: -1, name: 'Algemene documenten', createdAt: new Date(), color: 'bg-gray-100 text-gray-800 border-gray-200' }
   ]);
+  const [isLoading, setIsLoading] = useState(false); 
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        // Haal documenten op
+        const docsResponse = await fetch('/api/documents');
+        const docs = await docsResponse.json();
+        setDocuments(docs);
+        
+        // Haal documentmappen op
+        const foldersResponse = await fetch('/api/folders');
+        const folders = await foldersResponse.json();
+        setDocumentFolders(folders);
+
+        // TODO: Haal ook chatmappen en chatsessies op indien nodig
+
+      } catch (error) {
+        console.error("Kon initiële data niet ophalen:", error);
+      }
+    };
+
+    fetchInitialData();
+  }, []); // De lege afhankelijkheids-array zorgt dat dit maar één keer gebeurt bij de initiële render
+  
+  const getActiveContextDocuments = () => {
+    const activeFolderIds = activeContextFolders.map(folder => folder.id);
+    const folderContextDocs = documents.filter(doc => {
+      const docFolderId = doc.folderId === undefined ? -1 : doc.folderId;
+      return activeFolderIds.includes(docFolderId);
+    });
+
+    const chatContextDocs = selectedChatId
+      ? documents.filter(doc => doc.folderId === selectedChatId)
+      : [];
+
+    
+    const combinedDocs = [...folderContextDocs, ...chatContextDocs];
+    const uniqueDocs = Array.from(new Set(combinedDocs.map(doc => doc.id)))
+        .map(id => combinedDocs.find(doc => doc.id === id)!);
+
+    return uniqueDocs;
+  };
+
+  const handleUploadDocument = (newDoc: Document) => {
+  // Dit simuleert een API-aanroep naar je back-end om een document op te slaan
+  // setTimeout vervangen door een echte fetch-aanroep
+    console.log("Simuleer API-aanroep: Document uploaden...");
+    setTimeout(() => {
+      // Hier zou de back-end het document verwerken en een ID teruggeven
+      const savedDoc = { ...newDoc, id: Date.now() + Math.random() };
+      setDocuments(prev => [...prev, savedDoc]);
+      console.log("Document succesvol opgeslagen! ID:", savedDoc.id);
+    }, 500);
+  };
+
+  const handleRemoveDocument = (documentId: number) => {
+    if (confirm("Weet je zeker dat je dit document wilt verwijderen?")) {
+      // Dit simuleert een DELETE-verzoek aan je back-end
+      console.log(`Simuleer API-aanroep: Document ${documentId} verwijderen...`);
+      setTimeout(() => {
+        setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+        console.log(`Document ${documentId} succesvol verwijderd.`);
+      }, 500);
+    }
+  };
   
   const generateChatTitle = (firstUserMessage: string) => {
     return firstUserMessage.length > 50 
@@ -76,15 +133,8 @@ const DashboardPage = () => {
       }
     }
 
-    setCurrentChat([
-      {
-        id: Date.now(),
-        type: 'bot',
-        content: 'Hallo! Ik ben je AI assistent. Hoe kan ik je vandaag helpen?',
-        timestamp: new Date()
-      }
-    ]);
     setSelectedChatId(null);
+    setCurrentChat([]);
     setViewMode('chat');
     setIsSidebarOpen(false);
   };
@@ -117,22 +167,53 @@ const DashboardPage = () => {
     setViewMode('chat');
   };
 
-  const handleSendMessage = (newMessage: Message) => {
+  const handleSendMessage = async (newMessage: Message) => {
+    // Stap 1: Voeg het bericht van de gebruiker toe aan de chat
     setCurrentChat(prev => [...prev, newMessage]);
-    
-    if (selectedChatId) {
-      setChatSessions(prev => 
-        prev.map(chat => 
-          chat.id === selectedChatId 
-            ? { 
-                ...chat, 
-                messages: [...chat.messages, newMessage],
-                timestamp: formatTimestamp(new Date()),
-                preview: newMessage.type === 'user' ? generatePreview([...chat.messages, newMessage]) : chat.preview
-              }
-            : chat
-        )
-      );
+    setIsLoading(true);
+
+    // Stap 2: Bepaal welke documenten relevant zijn voor de context
+    const relevantDocuments = getActiveContextDocuments();
+
+    try {
+      // Stap 3: Roep je back-end RAG API aan
+      const response = await fetch('/api/rag', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          question: newMessage.content,
+          contextDocumentIds: relevantDocuments.map(doc => doc.id) // of de volledige documenten: contextDocuments: relevantDocuments
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Netwerkrespons was niet ok');
+      }
+
+      const data = await response.json();
+      
+      // Stap 4: Maak het antwoord van de bot en voeg het toe aan de chat
+      const botResponse: Message = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: data.answer, // De API moet een 'answer' veld teruggeven
+        timestamp: new Date()
+      };
+      setCurrentChat(prev => [...prev, botResponse]);
+
+    } catch (error) {
+      console.error("Fout bij het ophalen van RAG-antwoord:", error);
+      const errorMessage: Message = {
+        id: Date.now() + 1,
+        type: 'bot',
+        content: "Excuses, ik kon geen antwoord genereren. Probeer het later opnieuw.",
+        timestamp: new Date()
+      };
+      setCurrentChat(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -168,22 +249,13 @@ const DashboardPage = () => {
     setActiveContextFolders(updatedFolders);
   };
 
-  // NIEUWE FUNCTIE VOOR HET VERWIJDEREN VAN EEN CHAT
   const handleDeleteChat = (chatId: number) => {
     if (confirm("Weet je zeker dat je deze chat wilt verwijderen? Dit kan niet ongedaan gemaakt worden.")) {
       setChatSessions(prev => prev.filter(chat => chat.id !== chatId));
       
-      // Reset de huidige chat als de verwijderde chat de actieve chat was
       if (selectedChatId === chatId) {
         setSelectedChatId(null);
-        setCurrentChat([
-          {
-            id: Date.now(),
-            type: 'bot',
-            content: 'Hallo! Ik ben je AI assistent. Hoe kan ik je vandaag helpen?',
-            timestamp: new Date()
-          }
-        ]);
+        setCurrentChat([]);
       }
     }
   };
@@ -228,6 +300,10 @@ const DashboardPage = () => {
               onSendMessage={handleSendMessage}
               onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
               isSidebarOpen={isSidebarOpen}
+              onUploadDocument={handleUploadDocument} 
+              activeChatId={selectedChatId} 
+              onRemoveDocument={handleRemoveDocument}
+              isLoading={isLoading}
             />
           ) : viewMode === 'documents' ? (
             <DocumentViewer 
@@ -250,7 +326,7 @@ const DashboardPage = () => {
               onUpdateChatSessions={setChatSessions}
               onUpdateFolders={setChatFolders}
               folders={chatFolders}
-              onDeleteChat={handleDeleteChat} // NIEUWE PROP DOORGEVEN
+              onDeleteChat={handleDeleteChat}
             />
           )}
         </div>
