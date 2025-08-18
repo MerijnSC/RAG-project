@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, Menu, Plus, FileText, X, CheckCircle, Upload } from 'lucide-react';
+import { Send, Bot, Loader2, Menu, FilePlus, FileText, X, Forward, CheckCircle, Upload } from 'lucide-react';
 import { Message, ChatInterfaceProps, Document } from '../types/chat';
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -12,10 +12,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onUploadDocument,
   activeChatId,
   onRemoveDocument,
-  isLoading
+  isLoading,
+  uploadedDocuments
 }) => {
   const [input, setInput] = useState('');
-  const [uploadedFiles, setUploadedFiles] = useState<Document[]>([]);
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'uploading' | 'success'>('idle');
   const [isDragOver, setIsDragOver] = useState(false);
   
@@ -32,8 +32,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
-
+  }, [messages, uploadedDocuments]); 
+  
   // Auto-resize textarea
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -42,11 +42,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
     }
   }, [input]);
-
-  // Zorgt dat geüploade bestanden in de UI verdwijnen als er een nieuwe chat wordt geselecteerd
-  useEffect(() => {
-    setUploadedFiles([]);
-  }, [activeChatId]);
 
   const handleSend = async (e: React.FormEvent | React.KeyboardEvent) => {
     e.preventDefault();
@@ -100,22 +95,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     setUploadStatus('uploading');
     
+    // Maak een Document-object aan van het File-object
     const newDocument: Document = {
       id: Date.now(),
       name: file.name,
       type: file.type || file.name.split('.').pop() || 'BESTAND',
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date(),
-      folderId: activeChatId || undefined,
+      folderId: activeChatId ? activeChatId : undefined, 
     };
 
-    // Simuleer upload tijd
     setTimeout(() => {
-      setUploadedFiles(prev => [...prev, newDocument]);
-      onUploadDocument(newDocument);
+      onUploadDocument(newDocument); 
+      
       setUploadStatus('success');
       
-      // Reset status na 2 seconden
       setTimeout(() => setUploadStatus('idle'), 2000);
     }, 1000);
   };
@@ -132,9 +126,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     e.target.value = ''; // reset file input
   };
 
-  const removeFile = (fileId: number) => {
-    setUploadedFiles(prev => prev.filter(f => f.id !== fileId));
-    onRemoveDocument(fileId);
+  const removeDocument = (documentId: number) => {
+    onRemoveDocument(documentId);
   };
 
   // Drag and Drop handlers
@@ -211,7 +204,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Upload Status/Files Section */}
-      {(uploadedFiles.length > 0 || uploadStatus !== 'idle') && (
+      {(uploadedDocuments.length > 0 || uploadStatus !== 'idle') && (
         <div className="px-6">
           <div className="max-w-3xl mx-auto py-3">
             
@@ -222,31 +215,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 <span className="text-sm">Bestand uploaden...</span>
               </div>
             )}
-            
-            {uploadStatus === 'success' && (
-              <div className="flex items-center space-x-2 text-green-600 mb-3">
-                <CheckCircle className="w-4 h-4" />
-                <span className="text-sm">Bestand toegevoegd!</span>
-              </div>
-            )}
 
-            {/* Uploaded Files */}
-            {uploadedFiles.length > 0 && (
+            {/* Uploaded Documents */}
+            {uploadedDocuments.length > 0 && (
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-2">
-                  {uploadedFiles.map(file => (
-                    <div key={file.id} className="bg-white border border-blue-200 rounded-lg px-3 py-2 flex items-center space-x-2 group shadow-sm hover:shadow-md transition-shadow">
+                  {uploadedDocuments.map(document => (
+                    <div key={document.id} className="bg-white border border-blue-200 rounded-lg px-3 py-2 flex items-center space-x-2 group shadow-sm hover:shadow-md transition-shadow">
                       <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
                       <div className="flex flex-col min-w-0">
-                        <span className="text-sm text-gray-800 truncate max-w-[150px]" title={file.name}>
-                          {file.name}
+                        <span className="text-sm text-gray-800 truncate max-w-[150px]" title={document.name}>
+                          {document.name}
                         </span>
-                        <span className="text-xs text-gray-500">{file.size}</span>
+                        <span className="text-xs text-gray-500">{document.size}</span>
                       </div>
                       <button
-                        onClick={() => removeFile(file.id)}
+                        onClick={() => removeDocument(document.id)}
                         className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all ml-1 p-1 hover:bg-red-50 rounded"
-                        title="Bestand verwijderen"
+                        title="Document verwijderen"
                       >
                         <X className="w-3 h-3" />
                       </button>
@@ -323,7 +309,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition-colors duration-200 flex items-center justify-center flex-shrink-0 h-12 w-12 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Bericht versturen"
             >
-              <Send className="w-5 h-5" />
+              <Forward className="w-6 h-6" />
             </button>
           </div>
         </div>

@@ -22,6 +22,7 @@ const DashboardPage = () => {
     { id: -1, name: 'Algemene documenten', createdAt: new Date(), color: 'bg-gray-100 text-gray-800 border-gray-200' }
   ]);
   const [isLoading, setIsLoading] = useState(false); 
+  const [newChatDocumentIds, setNewChatDocumentIds] = useState<number[]>([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -47,43 +48,52 @@ const DashboardPage = () => {
   }, []); // De lege afhankelijkheids-array zorgt dat dit maar één keer gebeurt bij de initiële render
   
   const getActiveContextDocuments = () => {
-    const activeFolderIds = activeContextFolders.map(folder => folder.id);
-    const folderContextDocs = documents.filter(doc => {
-      const docFolderId = doc.folderId === undefined ? -1 : doc.folderId;
-      return activeFolderIds.includes(docFolderId);
-    });
+  const activeFolderIds = activeContextFolders.map(folder => folder.id);
+  
+  // Documenten uit geselecteerde algemene mappen
+  const folderContextDocs = documents.filter(doc => {
+    const docFolderId = doc.folderId === undefined ? -1 : doc.folderId;
+    return activeFolderIds.includes(docFolderId);
+  });
 
-    const chatContextDocs = selectedChatId
-      ? documents.filter(doc => doc.folderId === selectedChatId)
-      : [];
+  // Documenten uit de opgeslagen, actieve chat
+  const chatContextDocs = selectedChatId
+    ? documents.filter(doc => doc.folderId === selectedChatId)
+    : [];
 
-    
-    const combinedDocs = [...folderContextDocs, ...chatContextDocs];
-    const uniqueDocs = Array.from(new Set(combinedDocs.map(doc => doc.id)))
-        .map(id => combinedDocs.find(doc => doc.id === id)!);
+  // BIJGEWERKTE LOGICA HIERONDER
+  // Documenten die zijn geüpload in de huidige, nieuwe (nog niet opgeslagen) chat
+  const newChatContextDocs = selectedChatId === null
+    ? documents.filter(doc => newChatDocumentIds.includes(doc.id))
+    : [];
+  
+  // Combineer alle contextdocumenten en verwijder duplicaten
+  const combinedDocs = [...folderContextDocs, ...chatContextDocs, ...newChatContextDocs];
+  const uniqueDocs = Array.from(new Set(combinedDocs.map(doc => doc.id)))
+      .map(id => combinedDocs.find(doc => doc.id === id)!);
 
-    return uniqueDocs;
-  };
+  return uniqueDocs;
+};
 
   const handleUploadDocument = (newDoc: Document) => {
-  // Dit simuleert een API-aanroep naar je back-end om een document op te slaan
-  // setTimeout vervangen door een echte fetch-aanroep
-    console.log("Simuleer API-aanroep: Document uploaden...");
-    setTimeout(() => {
-      // Hier zou de back-end het document verwerken en een ID teruggeven
-      const savedDoc = { ...newDoc, id: Date.now() + Math.random() };
-      setDocuments(prev => [...prev, savedDoc]);
-      console.log("Document succesvol opgeslagen! ID:", savedDoc.id);
-    }, 500);
-  };
+  setTimeout(() => {
+    const savedDoc = { ...newDoc, id: Date.now() + Math.random() };
+    setDocuments(prev => [...prev, savedDoc]);
+
+    // BIJGEWERKTE LOGICA HIERONDER
+    // Als we in een nieuwe chat zijn (geen geselecteerde chat ID),
+    // voeg het ID van het document toe aan onze tijdelijke lijst.
+    if (selectedChatId === null) {
+      setNewChatDocumentIds(prev => [...prev, savedDoc.id]);
+    }
+  }, 500);
+};
 
   const handleRemoveDocument = (documentId: number) => {
     if (confirm("Weet je zeker dat je dit document wilt verwijderen?")) {
       // Dit simuleert een DELETE-verzoek aan je back-end
-      console.log(`Simuleer API-aanroep: Document ${documentId} verwijderen...`);
       setTimeout(() => {
         setDocuments(prev => prev.filter(doc => doc.id !== documentId));
-        console.log(`Document ${documentId} succesvol verwijderd.`);
       }, 500);
     }
   };
@@ -116,28 +126,43 @@ const DashboardPage = () => {
   };
 
   const handleNewChat = () => {
-    if (currentChat.some(msg => msg.type === 'user')) {
-      const firstUserMessage = currentChat.find(msg => msg.type === 'user');
-      if (firstUserMessage) {
-        const newChatSession: ChatSession = {
-          id: Date.now(),
-          title: generateChatTitle(firstUserMessage.content),
-          timestamp: formatTimestamp(new Date()),
-          preview: generatePreview(currentChat),
-          messages: [...currentChat],
-          createdAt: new Date(),
-          folderId: currentActiveFolder || undefined
-        };
+  // Sla de huidige chat op als er berichten zijn
+  if (currentChat.some(msg => msg.type === 'user')) {
+    const firstUserMessage = currentChat.find(msg => msg.type === 'user');
+    if (firstUserMessage) {
+      const newChatSession: ChatSession = {
+        id: Date.now(),
+        title: generateChatTitle(firstUserMessage.content),
+        timestamp: formatTimestamp(new Date()),
+        preview: generatePreview(currentChat),
+        messages: [...currentChat],
+        createdAt: new Date(),
+        folderId: currentActiveFolder || undefined
+      };
 
-        setChatSessions(prev => [newChatSession, ...prev]);
+      setChatSessions(prev => [newChatSession, ...prev]);
+
+      // BIJGEWERKTE LOGICA HIERONDER
+      // Als er documenten waren in de tijdelijke lijst, koppel ze nu aan de zojuist gemaakte chat
+      if (newChatDocumentIds.length > 0) {
+        setDocuments(prevDocs =>
+          prevDocs.map(doc =>
+            newChatDocumentIds.includes(doc.id)
+              ? { ...doc, folderId: newChatSession.id } // Koppel document aan nieuwe chat ID
+              : doc
+          )
+        );
       }
     }
+  }
 
-    setSelectedChatId(null);
-    setCurrentChat([]);
-    setViewMode('chat');
-    setIsSidebarOpen(false);
-  };
+  // Reset de state voor een schone, nieuwe chat
+  setSelectedChatId(null);
+  setCurrentChat([]);
+  setNewChatDocumentIds([]); // Maak de tijdelijke lijst leeg
+  setViewMode('chat');
+  setIsSidebarOpen(false);
+};
 
   const handleChatSelect = (chatId: number) => {
     if (currentChat.some(msg => msg.type === 'user') && selectedChatId === null) {
@@ -175,6 +200,9 @@ const DashboardPage = () => {
     // Stap 2: Bepaal welke documenten relevant zijn voor de context
     const relevantDocuments = getActiveContextDocuments();
 
+    // Toon de ID's van de documenten die als context worden gebruikt
+    console.log("Actieve context document ID's:", relevantDocuments.map(doc => doc.id));
+
     try {
       // Stap 3: Roep je back-end RAG API aan
       const response = await fetch('/api/rag', {
@@ -184,7 +212,7 @@ const DashboardPage = () => {
         },
         body: JSON.stringify({
           question: newMessage.content,
-          contextDocumentIds: relevantDocuments.map(doc => doc.id) // of de volledige documenten: contextDocuments: relevantDocuments
+          contextDocumentIds: relevantDocuments.map(doc => doc.id)
         }),
       });
 
@@ -198,7 +226,7 @@ const DashboardPage = () => {
       const botResponse: Message = {
         id: Date.now() + 1,
         type: 'bot',
-        content: data.answer, // De API moet een 'answer' veld teruggeven
+        content: data.answer,
         timestamp: new Date()
       };
       setCurrentChat(prev => [...prev, botResponse]);
@@ -304,6 +332,10 @@ const DashboardPage = () => {
               activeChatId={selectedChatId} 
               onRemoveDocument={handleRemoveDocument}
               isLoading={isLoading}
+              uploadedDocuments={getActiveContextDocuments().filter(doc => 
+                (selectedChatId === null && newChatDocumentIds.includes(doc.id)) ||
+                (selectedChatId !== null && doc.folderId === selectedChatId)
+              )}
             />
           ) : viewMode === 'documents' ? (
             <DocumentViewer 

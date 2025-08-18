@@ -63,6 +63,7 @@ export interface ChatInterfaceProps {
   activeChatId: number | null;
   onRemoveDocument: (documentId: number) => void;
   isLoading: boolean; 
+  uploadedDocuments: Document[];
 }
 
 export interface ChatHistoryViewerProps {
