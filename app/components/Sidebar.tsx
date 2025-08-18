@@ -1,7 +1,8 @@
 'use client';
 
-import { MessageSquarePlus, History, File, FileText, Clock, User, Settings, LogOut, Bot, Folder, FolderOpen } from 'lucide-react';
+import { MessageSquarePlus, History, File, FileText, Clock, User, Settings, LogOut, Bot, Folder, FolderOpen, Snail } from 'lucide-react';
 import { SidebarProps } from '../types/chat';
+import { useRouter } from 'next/navigation'; 
 
 const Sidebar: React.FC<SidebarProps> = ({ 
   onNewChat, 
@@ -17,6 +18,15 @@ const Sidebar: React.FC<SidebarProps> = ({
   activeContextFolders,
   onManageContext,      
 }) => {
+  const router = useRouter(); 
+
+  const handleLogout = () => {
+    // Hier kun je later nog eventuele backend logica toevoegen,
+    // zoals het ongeldig maken van een token of het leegmaken van de cache.
+    // Voor nu richten we ons op de navigatie.
+    router.push('/'); 
+  };
+
   const menuItems = [
     { 
       icon: MessageSquarePlus, 
@@ -47,7 +57,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-            <Bot className="w-6 h-6 text-white" />
+            <Snail className="w-6 h-6 text-white" />
           </div>
           <div>
             <h1 className="text-xl font-semibold text-gray-900">AI Assistant</h1>
@@ -264,7 +274,10 @@ const Sidebar: React.FC<SidebarProps> = ({
             <Settings className="w-4 h-4" />
             <span>Instellingen</span>
           </button>
-          <button className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+          <button 
+            onClick={handleLogout}
+            className="flex-1 flex items-center justify-center space-x-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          >
             <LogOut className="w-4 h-4" />
             <span>Uitloggen</span>
           </button>

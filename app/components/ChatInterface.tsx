@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, Loader2, Menu, FilePlus, FileText, X, Forward, CheckCircle, Upload } from 'lucide-react';
+import { Send, Bot, Loader2, Menu, FilePlus, FileText, X, Forward, CheckCircle, Upload , Snail} from 'lucide-react';
 import { Message, ChatInterfaceProps, Document } from '../types/chat';
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({
@@ -23,7 +23,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const allowedTypes = ['.pdf', '.docx', '.txt', '.md'];
+  const allowedTypes = ['.pdf', '.docx', '.txt', '.md', '.csv'];
   const maxFileSize = 10 * 1024 * 1024; // 10MB
 
   const scrollToBottom = () => {
@@ -163,7 +163,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         </button>
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-            <Bot className="w-5 h-5 text-white" />
+            <Snail className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-gray-900">AI Assistant</h1>
         </div>
@@ -189,7 +189,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <div className="flex justify-start">
             <div className="flex items-end space-x-2">
               <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
-                <Bot className="w-5 h-5 text-gray-700" />
+                <Snail className="w-5 h-5 text-gray-700" />
               </div>
               <div className="bg-white rounded-2xl rounded-bl-md border border-gray-200 px-4 py-3">
                 <div className="flex items-center space-x-2">
@@ -250,7 +250,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="flex items-start space-x-3 w-full max-w-3xl">
           {/* Textarea with Drag & Drop */}
           <div 
-            className={`flex-1 relative ${isDragOver ? 'ring-2 ring-blue-400 ring-opacity-50' : ''}`}
+            className={`flex-1 relative`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
@@ -272,7 +272,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {isDragOver && (
               <div className="absolute inset-0 bg-blue-50 bg-opacity-80 border-2 border-dashed border-blue-400 rounded-2xl flex items-center justify-center pointer-events-none">
                 <div className="flex flex-col items-center space-y-2 text-blue-600">
-                  <Upload className="w-8 h-8" />
+                  <Upload className="w-6 h-6" />
                   <span className="text-sm font-medium">Sleep bestand hier</span>
                 </div>
               </div>

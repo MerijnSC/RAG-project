@@ -142,7 +142,6 @@ const DashboardPage = () => {
 
       setChatSessions(prev => [newChatSession, ...prev]);
 
-      // BIJGEWERKTE LOGICA HIERONDER
       // Als er documenten waren in de tijdelijke lijst, koppel ze nu aan de zojuist gemaakte chat
       if (newChatDocumentIds.length > 0) {
         setDocuments(prevDocs =>
