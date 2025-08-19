@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     },
     { 
       icon: History, 
-      label: "Doorzoek gesprekken", 
+      label: "Sorteer gesprekken", 
       action: onHistoryView,
       active: viewMode === 'history',
       id: 'chat-history'
