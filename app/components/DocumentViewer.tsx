@@ -8,8 +8,8 @@ const DocumentViewer = ({
   onBack, 
   documents, 
   onUpdateDocuments, 
-  folders, 
-  onUpdateFolders,
+  docFolders, 
+  onUpdateDocFolders,
   activeContextFolders,
   onUpdateActiveContext
 }: DocumentViewerProps) => {
@@ -55,9 +55,9 @@ const DocumentViewer = ({
         id: Date.now(),
         name: newFolderName.trim(),
         createdAt: new Date(),
-        color: folderColors[folders.length % folderColors.length]
+        color: folderColors[docFolders.length % folderColors.length]
       };
-      onUpdateFolders([...folders, newFolder]);
+      onUpdateDocFolders([...docFolders, newFolder]);
       setNewFolderName('');
       setIsCreatingFolder(false);
     }
@@ -65,7 +65,7 @@ const DocumentViewer = ({
 
   const deleteFolder = (folderId: number) => {
     // 1. Verwijder de map uit de lijst van alle mappen
-    onUpdateFolders(folders.filter(f => f.id !== folderId));
+    onUpdateDocFolders(docFolders.filter(f => f.id !== folderId));
     
     // 2. Verwijder de map ook uit de lijst van actieve contextmappen
     onUpdateActiveContext(activeContextFolders.filter(f => f.id !== folderId));
@@ -193,7 +193,7 @@ const DocumentViewer = ({
     }
   };
   
-  const selectedFolderData = folders.find(f => f.id === selectedFolder);
+  const selectedFolderData = docFolders.find(f => f.id === selectedFolder);
   const filteredDocuments = getFilteredDocuments();
 
   // Controleer of de Algemene Documenten map actief is
@@ -321,7 +321,7 @@ const DocumentViewer = ({
             <hr className="my-4" />
             
             {/* Custom folders */}
-            {folders.map(folder => {
+            {docFolders.map(folder => {
               const isActive = activeContextFolders.some(f => f.id === folder.id);
               return (
                 <div
@@ -579,7 +579,7 @@ const DocumentViewer = ({
                 </div>
               </div>
               
-              {folders.map(folder => (
+              {docFolders.map(folder => (
                 <div
                   key={folder.id}
                   onClick={() => moveDocumentsToFolder(folder.id)}

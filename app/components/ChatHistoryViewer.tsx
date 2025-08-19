@@ -9,8 +9,8 @@ const ChatHistoryViewer = ({
   chatSessions, 
   onChatSelect, 
   onUpdateChatSessions, 
-  onUpdateFolders, 
-  folders,
+  onUpdateChatFolders, 
+  chatFolders,
   onDeleteChat
 }: ChatHistoryViewerProps) => {
   const [selectedFolder, setSelectedFolder] = useState<number | null>(null);
@@ -38,22 +38,22 @@ const ChatHistoryViewer = ({
         id: Date.now(),
         name: newFolderName.trim(),
         createdAt: new Date(),
-        color: folderColors[folders.length % folderColors.length]
+        color: folderColors[chatFolders.length % folderColors.length]
       };
-      onUpdateFolders([...folders, newFolder]);
+      onUpdateChatFolders([...chatFolders, newFolder]);
       setNewFolderName('');
       setIsCreatingFolder(false);
     }
   };
 
   const deleteFolder = (folderId: number) => {
-    if (confirm(`Map "${folders.find(f => f.id === folderId)?.name}" verwijderen? Chats worden teruggezet naar "Algemene Chats".`)) {
+    if (confirm(`Map "${chatFolders.find(f => f.id === folderId)?.name}" verwijderen? Chats worden teruggezet naar "Algemene Chats".`)) {
       const updatedSessions = chatSessions.map(chat => 
         chat.folderId === folderId ? { ...chat, folderId: undefined } : chat
       );
       onUpdateChatSessions(updatedSessions);
       
-      onUpdateFolders(folders.filter(f => f.id !== folderId));
+      onUpdateChatFolders(chatFolders.filter(f => f.id !== folderId));
       
       if (selectedFolder === folderId) {
         setSelectedFolder(null);
@@ -126,7 +126,7 @@ const ChatHistoryViewer = ({
     );
   };
 
-  const selectedFolderData = folders.find(f => f.id === selectedFolder);
+  const selectedFolderData = chatFolders.find(f => f.id === selectedFolder);
 
   return (
     <div className="h-full flex flex-col bg-white">
@@ -218,7 +218,7 @@ const ChatHistoryViewer = ({
             </div>
 
             {/* Custom folders */}
-            {folders.map(folder => (
+            {chatFolders.map(folder => (
               <div
                 key={folder.id}
                 className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors mb-2 border ${
@@ -412,7 +412,7 @@ const ChatHistoryViewer = ({
                 </div>
               </div>
               
-              {folders.map(folder => (
+              {chatFolders.map(folder => (
                 <div
                   key={folder.id}
                   onClick={() => moveChatsToFolder(folder.id)}

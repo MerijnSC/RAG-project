@@ -12,13 +12,13 @@ const DashboardPage = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]); 
   const [chatFolders, setChatFolders] = useState<ChatFolder[]>([]);
-  const [currentActiveFolder, setCurrentActiveFolder] = useState<number | null>(null);
+  const [currentActiveChatFolder, setCurrentActiveChatFolder] = useState<number | null>(null);
   const [currentChat, setCurrentChat] = useState<Message[]>([ ]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('chat');
   const [documents, setDocuments] = useState<Document[]>([]);
   const [documentFolders, setDocumentFolders] = useState<DocumentFolder[]>([]);
-  const [activeContextFolders, setActiveContextFolders] = useState<DocumentFolder[]>([
+  const [activeContextDocFolders, setActiveContextDocFolders] = useState<DocumentFolder[]>([
     { id: -1, name: 'Algemene documenten', createdAt: new Date(), color: 'bg-gray-100 text-gray-800 border-gray-200' }
   ]);
   const [isLoading, setIsLoading] = useState(false); 
@@ -48,32 +48,31 @@ const DashboardPage = () => {
   }, []); // De lege afhankelijkheids-array zorgt dat dit maar één keer gebeurt bij de initiële render
   
   const getActiveContextDocuments = () => {
-  const activeFolderIds = activeContextFolders.map(folder => folder.id);
-  
-  // Documenten uit geselecteerde algemene mappen
-  const folderContextDocs = documents.filter(doc => {
-    const docFolderId = doc.folderId === undefined ? -1 : doc.folderId;
-    return activeFolderIds.includes(docFolderId);
-  });
+    const activeFolderIds = activeContextDocFolders.map(folder => folder.id);
+    
+    // Documenten uit geselecteerde algemene mappen
+    const folderContextDocs = documents.filter(doc => {
+      const docFolderId = doc.folderId === undefined ? -1 : doc.folderId;
+      return activeFolderIds.includes(docFolderId);
+    });
 
-  // Documenten uit de opgeslagen, actieve chat
-  const chatContextDocs = selectedChatId
-    ? documents.filter(doc => doc.folderId === selectedChatId)
-    : [];
+    // Documenten uit de opgeslagen, actieve chat
+    const chatContextDocs = selectedChatId
+      ? documents.filter(doc => doc.folderId === selectedChatId)
+      : [];
 
-  // BIJGEWERKTE LOGICA HIERONDER
-  // Documenten die zijn geüpload in de huidige, nieuwe (nog niet opgeslagen) chat
-  const newChatContextDocs = selectedChatId === null
-    ? documents.filter(doc => newChatDocumentIds.includes(doc.id))
-    : [];
-  
-  // Combineer alle contextdocumenten en verwijder duplicaten
-  const combinedDocs = [...folderContextDocs, ...chatContextDocs, ...newChatContextDocs];
-  const uniqueDocs = Array.from(new Set(combinedDocs.map(doc => doc.id)))
-      .map(id => combinedDocs.find(doc => doc.id === id)!);
+    // Documenten die zijn geüpload in de huidige, nieuwe (nog niet opgeslagen) chat
+    const newChatContextDocs = selectedChatId === null
+      ? documents.filter(doc => newChatDocumentIds.includes(doc.id))
+      : [];
+    
+    // Combineer alle contextdocumenten en verwijder duplicaten
+    const combinedDocs = [...folderContextDocs, ...chatContextDocs, ...newChatContextDocs];
+    const uniqueDocs = Array.from(new Set(combinedDocs.map(doc => doc.id)))
+        .map(id => combinedDocs.find(doc => doc.id === id)!);
 
-  return uniqueDocs;
-};
+    return uniqueDocs;
+  };
 
   const handleUploadDocument = (newDoc: Document) => {
   setTimeout(() => {
@@ -87,7 +86,7 @@ const DashboardPage = () => {
       setNewChatDocumentIds(prev => [...prev, savedDoc.id]);
     }
   }, 500);
-};
+  };
 
   const handleRemoveDocument = (documentId: number) => {
     if (confirm("Weet je zeker dat je dit document wilt verwijderen?")) {
@@ -137,7 +136,7 @@ const DashboardPage = () => {
         preview: generatePreview(currentChat),
         messages: [...currentChat],
         createdAt: new Date(),
-        folderId: currentActiveFolder || undefined
+        folderId: currentActiveChatFolder || undefined
       };
 
       setChatSessions(prev => [newChatSession, ...prev]);
@@ -166,6 +165,7 @@ const DashboardPage = () => {
   const handleChatSelect = (chatId: number) => {
     if (currentChat.some(msg => msg.type === 'user') && selectedChatId === null) {
       handleNewChat();
+      setViewMode('chat');
     }
 
     const selectedChat = chatSessions.find(chat => chat.id === chatId);
@@ -254,15 +254,15 @@ const DashboardPage = () => {
   };
 
   const getCurrentActiveFolder = () => {
-    return chatFolders.find(f => f.id === currentActiveFolder);
+    return chatFolders.find(f => f.id === currentActiveChatFolder);
   };
 
   const getSidebarChats = () => {
     return chatSessions.filter(chat => {
-      if (currentActiveFolder === null) {
+      if (currentActiveChatFolder === null) {
         return !chat.folderId;
       }
-      return chat.folderId === currentActiveFolder;
+      return chat.folderId === currentActiveChatFolder;
     });
   };
 
@@ -271,9 +271,9 @@ const DashboardPage = () => {
   };
 
   const handleUpdateActiveContext = (folders: DocumentFolder[]) => {
-    const generalFolder = activeContextFolders.find(f => f.id === -1);
+    const generalFolder = activeContextDocFolders.find(f => f.id === -1);
     const updatedFolders = generalFolder ? [generalFolder, ...folders.filter(f => f.id !== -1)] : folders;
-    setActiveContextFolders(updatedFolders);
+    setActiveContextDocFolders(updatedFolders);
   };
 
   const handleDeleteChat = (chatId: number) => {
@@ -313,9 +313,9 @@ const DashboardPage = () => {
             recentChats={getSidebarChats()}
             viewMode={viewMode}
             currentActiveFolder={getCurrentActiveFolder()}
-            folders={chatFolders}
-            onFolderSelect={setCurrentActiveFolder}
-            activeContextFolders={activeContextFolders}
+            chatFolders={chatFolders}
+            onChatFolderSelect={setCurrentActiveChatFolder}
+            activeContextDocFolders={activeContextDocFolders}
             onManageContext={handleManageContext}
           />
         </div>
@@ -341,22 +341,19 @@ const DashboardPage = () => {
               onBack={handleBackToChat}
               documents={documents}
               onUpdateDocuments={setDocuments}
-              folders={documentFolders}
-              onUpdateFolders={setDocumentFolders}
-              activeContextFolders={activeContextFolders}
+              docFolders={documentFolders}
+              onUpdateDocFolders={setDocumentFolders}
+              activeContextFolders={activeContextDocFolders}
               onUpdateActiveContext={handleUpdateActiveContext}
             />
           ) : (
             <ChatHistoryViewer
               onBack={handleBackToChat}
               chatSessions={chatSessions}
-              onChatSelect={(chatId) => {
-                handleChatSelect(chatId);
-                setViewMode('chat');
-              }}
+              onChatSelect={handleChatSelect}
               onUpdateChatSessions={setChatSessions}
-              onUpdateFolders={setChatFolders}
-              folders={chatFolders}
+              onUpdateChatFolders={setChatFolders}
+              chatFolders={chatFolders}
               onDeleteChat={handleDeleteChat}
             />
           )}

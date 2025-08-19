@@ -13,9 +13,9 @@ const Sidebar: React.FC<SidebarProps> = ({
   onHistoryView,
   viewMode,
   currentActiveFolder,
-  folders,
-  onFolderSelect,
-  activeContextFolders,
+  chatFolders,
+  onChatFolderSelect,
+  activeContextDocFolders,
   onManageContext,      
 }) => {
   const router = useRouter(); 
@@ -101,9 +101,9 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           </div>
           
-          {activeContextFolders && activeContextFolders.length > 0 ? (
+          {activeContextDocFolders && activeContextDocFolders.length > 0 ? (
             <div className="space-y-1">
-              {activeContextFolders.map((folder) => (
+              {activeContextDocFolders.map((folder) => (
                 <div 
                   key={folder.id} 
                   className="w-full text-left px-3 py-2 rounded-lg bg-gray-50 text-gray-700"
@@ -142,7 +142,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div className="space-y-1">
             {/* Alle chats */}
             <button
-              onClick={() => onFolderSelect(null)}
+              onClick={() => onChatFolderSelect(null)}
               className={`w-full text-left px-3 py-2 rounded-lg transition-colors duration-200 ${
                 !currentActiveFolder
                   ? 'bg-blue-50 text-blue-600 border border-blue-200'
@@ -156,11 +156,11 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
 
             {/* Map knoppen */}
-            {folders.length > 0 ? (
-              folders.map((folder) => (
+            {chatFolders.length > 0 ? (
+              chatFolders.map((folder) => (
                 <button
                   key={folder.id}
-                  onClick={() => onFolderSelect(folder.id)}
+                  onClick={() => onChatFolderSelect(folder.id)}
                   className={`w-full text-left px-3 py-2 rounded-lg transition-colors duration-200 ${
                     currentActiveFolder?.id === folder.id
                       ? 'bg-blue-50 text-blue-600 border border-blue-200'

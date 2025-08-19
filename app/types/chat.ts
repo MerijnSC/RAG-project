@@ -48,9 +48,9 @@ export interface SidebarProps {
   onHistoryView: () => void;
   viewMode: ViewMode;
   currentActiveFolder?: ChatFolder | null;
-  folders: ChatFolder[];
-  onFolderSelect: (folderId: number | null) => void;
-  activeContextFolders: DocumentFolder[];
+  chatFolders: ChatFolder[];
+  onChatFolderSelect: (folderId: number | null) => void;
+  activeContextDocFolders: DocumentFolder[];
   onManageContext: () => void;
 }
 
@@ -71,8 +71,8 @@ export interface ChatHistoryViewerProps {
   chatSessions: ChatSession[];
   onChatSelect: (chatId: number) => void;
   onUpdateChatSessions: (sessions: ChatSession[]) => void;
-  onUpdateFolders: (folders: ChatFolder[]) => void;
-  folders: ChatFolder[];
+  onUpdateChatFolders: (folders: ChatFolder[]) => void;
+  chatFolders: ChatFolder[];
   onDeleteChat: (chatId: number) => void;
 }
 
@@ -80,8 +80,8 @@ export interface DocumentViewerProps {
   onBack: () => void;
   documents: Document[];
   onUpdateDocuments: (documents: Document[]) => void;
-  folders: DocumentFolder[];
-  onUpdateFolders: (folders: DocumentFolder[]) => void;
+  docFolders: DocumentFolder[];
+  onUpdateDocFolders: (folders: DocumentFolder[]) => void;
   activeContextFolders: DocumentFolder[];
   onUpdateActiveContext: (folders: DocumentFolder[]) => void;
 }
