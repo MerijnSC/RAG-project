@@ -94,4 +94,8 @@ export interface DocumentViewerProps {
   onUpdateActiveContext: (folders: DocumentFolder[]) => void;
 }
 
+export interface DocumentPreviewProps {
+  document: Document | null;
+}
+
 export type ViewMode = 'chat' | 'documents' | 'history';

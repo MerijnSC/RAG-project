@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { ArrowLeft, FileText, Upload, Trash2, Eye, Download, Folder, FolderPlus, Move, CheckCircle } from 'lucide-react';
 import { Document, DocumentViewerProps, DocumentFolder } from '../types/chat';
+import DocumentPreview from './DocumentPreview';
 
 const DocumentViewer = ({ 
   onBack, 
@@ -512,53 +513,8 @@ const DocumentViewer = ({
         </div>
 
         {/* Document Preview */}
-        <div className="hidden lg:block w-1/2 bg-gray-50">
-          {selectedDocument ? (
-            <div className="h-full flex flex-col">
-              <div className="border-b border-gray-200 bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-gray-900">{selectedDocument.name}</h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {selectedDocument.type} • {selectedDocument.size} • 
-                      Geüpload {formatDate(selectedDocument.uploadedAt)}
-                    </p>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                      <Download className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex-1 p-4 overflow-y-auto">
-                <div className="bg-white rounded-lg border border-gray-200 p-6 h-full">
-                  <div className="text-center text-gray-500 mt-20">
-                    <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p className="text-lg font-medium">Document Preview</p>
-                    <p className="text-sm mt-2">
-                      Preview functionaliteit wordt binnenkort toegevoegd
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="h-full flex items-center justify-center text-gray-500">
-              <div className="text-center">
-                <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p className="text-lg font-medium">Selecteer een document</p>
-                <p className="text-sm mt-2">
-                  Klik op een document om een preview te zien
-                </p>
-              </div>
-            </div>
-          )}
+        <div className="hidden lg:block w-1/2">
+          <DocumentPreview document={selectedDocument} />
         </div>
       </div>
 
