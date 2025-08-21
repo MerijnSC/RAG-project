@@ -12,7 +12,15 @@ export interface Document {
   size: string;
   uploadedAt: Date;
   content?: string;
-  folderId?: number;
+  documentFolderId?: number; 
+}
+
+export interface ChatDocumentLink {
+  id: number;
+  chatId: number;
+  documentId: number;
+  linkedAt: Date;
+  isContextActive: boolean; // Of dit document actief is als context voor deze chat
 }
 
 export interface ChatSession {
@@ -22,7 +30,7 @@ export interface ChatSession {
   preview: string;
   messages: Message[];
   createdAt: Date;
-  folderId?: number;
+  chatFolderId?: number;
 }
 
 export interface ChatFolder {
@@ -62,7 +70,7 @@ export interface ChatInterfaceProps {
   onUploadDocument: (doc: Document) => void;
   activeChatId: number | null;
   onRemoveDocument: (documentId: number) => void;
-  isLoading: boolean; 
+  isLoading: boolean;
   uploadedDocuments: Document[];
 }
 

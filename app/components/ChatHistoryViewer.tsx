@@ -30,8 +30,6 @@ const ChatHistoryViewer = ({
     'bg-sky-200 text-sky-900 border-sky-300'
   ];
   
-  // De formatDate functie is verwijderd uit deze component
-
   const createFolder = () => {
     if (newFolderName.trim()) {
       const newFolder: ChatFolder = {
@@ -49,7 +47,7 @@ const ChatHistoryViewer = ({
   const deleteFolder = (folderId: number) => {
     if (confirm(`Map "${chatFolders.find(f => f.id === folderId)?.name}" verwijderen? Chats worden teruggezet naar "Algemene Chats".`)) {
       const updatedSessions = chatSessions.map(chat => 
-        chat.folderId === folderId ? { ...chat, folderId: undefined } : chat
+        chat.chatFolderId === folderId ? { ...chat, chatFolderId: undefined } : chat
       );
       onUpdateChatSessions(updatedSessions);
       
@@ -64,7 +62,7 @@ const ChatHistoryViewer = ({
   const moveChatsToFolder = (folderId: number | null) => {
     const updatedSessions = chatSessions.map(chat => 
       selectedChats.includes(chat.id) 
-        ? { ...chat, folderId: folderId || undefined }
+        ? { ...chat, chatFolderId: folderId || undefined }
         : chat
     );
     onUpdateChatSessions(updatedSessions);
@@ -101,7 +99,7 @@ const ChatHistoryViewer = ({
     if (draggedChatId !== null) {
       const updatedSessions = chatSessions.map(chat => 
         chat.id === draggedChatId 
-          ? { ...chat, folderId: targetFolderId || undefined }
+          ? { ...chat, chatFolderId: targetFolderId || undefined }
           : chat
       );
       onUpdateChatSessions(updatedSessions);
@@ -113,9 +111,9 @@ const ChatHistoryViewer = ({
 
   const getFilteredChats = () => {
     if (selectedFolder === null) {
-      return chatSessions.filter(chat => !chat.folderId);
+      return chatSessions.filter(chat => !chat.chatFolderId);
     }
-    return chatSessions.filter(chat => chat.folderId === selectedFolder);
+    return chatSessions.filter(chat => chat.chatFolderId === selectedFolder);
   };
 
   const toggleChatSelection = (chatId: number) => {
@@ -212,7 +210,7 @@ const ChatHistoryViewer = ({
               <div className="flex-1">
                 <span className="font-medium">Algemene chats</span>
                 <p className="text-xs text-gray-500">
-                  {chatSessions.filter(chat => !chat.folderId).length} chats
+                  {chatSessions.filter(chat => !chat.chatFolderId).length} chats
                 </p>
               </div>
             </div>
@@ -237,7 +235,7 @@ const ChatHistoryViewer = ({
                 <div className="flex-1 min-w-0">
                   <span className="font-medium truncate">{folder.name}</span>
                   <p className="text-xs opacity-75">
-                    {chatSessions.filter(chat => chat.folderId === folder.id).length} chats
+                    {chatSessions.filter(chat => chat.chatFolderId === folder.id).length} chats
                   </p>
                 </div>
                 <button

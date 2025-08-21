@@ -6,14 +6,14 @@ import ChatInterface from '../components/ChatInterface';
 import DocumentViewer from '../components/DocumentViewer';
 import ChatHistoryViewer from '../components/ChatHistoryViewer';
 import Footer from '../components/Footer';
-import { Message, ChatSession, ChatFolder, Document, DocumentFolder, ViewMode } from '../types/chat';
+import { Message, ChatSession, ChatFolder, Document, DocumentFolder, ViewMode, ChatDocumentLink } from '../types/chat';
 
 const DashboardPage = () => {
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]); 
   const [chatFolders, setChatFolders] = useState<ChatFolder[]>([]);
   const [currentActiveChatFolder, setCurrentActiveChatFolder] = useState<number | null>(null);
-  const [currentChat, setCurrentChat] = useState<Message[]>([ ]);
+  const [currentChat, setCurrentChat] = useState<Message[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('chat');
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -21,8 +21,57 @@ const DashboardPage = () => {
   const [activeContextDocFolders, setActiveContextDocFolders] = useState<DocumentFolder[]>([
     { id: -1, name: 'Algemene documenten', createdAt: new Date(), color: 'bg-gray-100 text-gray-800 border-gray-200' }
   ]);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
+  const [chatDocumentLinks, setChatDocumentLinks] = useState<ChatDocumentLink[]>([]);
   const [newChatDocumentIds, setNewChatDocumentIds] = useState<number[]>([]);
+
+  const getDocumentsForChat = (chatId: number) => {
+    const linkIds = chatDocumentLinks
+      .filter(link => link.chatId === chatId)
+      .map(link => link.documentId);
+    return documents.filter(doc => linkIds.includes(doc.id));
+  };
+
+  const getActiveContextDocumentsForChat = (chatId: number) => {
+    const activeLinkIds = chatDocumentLinks
+      .filter(link => link.chatId === chatId && link.isContextActive)
+      .map(link => link.documentId);
+    return documents.filter(doc => activeLinkIds.includes(doc.id));
+  };
+
+  const linkDocumentToChat = (documentId: number, chatId: number, isContextActive: boolean = true) => {
+    // Check of link al bestaat
+    const existingLink = chatDocumentLinks.find(
+      link => link.documentId === documentId && link.chatId === chatId
+    );
+    
+    if (existingLink) {
+      // Update bestaande link
+      setChatDocumentLinks(prev =>
+        prev.map(link =>
+          link.id === existingLink.id
+            ? { ...link, isContextActive }
+            : link
+        )
+      );
+    } else {
+      // Maak nieuwe link
+      const newLink: ChatDocumentLink = {
+        id: Date.now() + Math.random(),
+        chatId,
+        documentId,
+        linkedAt: new Date(),
+        isContextActive
+      };
+      setChatDocumentLinks(prev => [...prev, newLink]);
+    }
+  };
+
+  const unlinkDocumentFromChat = (documentId: number, chatId: number) => {
+    setChatDocumentLinks(prev =>
+      prev.filter(link => !(link.documentId === documentId && link.chatId === chatId))
+    );
+  };
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -37,6 +86,11 @@ const DashboardPage = () => {
         const folders = await foldersResponse.json();
         setDocumentFolders(folders);
 
+        // Haal chat-document koppelingen op
+        const linksResponse = await fetch('/api/chat-document-links');
+        const links = await linksResponse.json();
+        setChatDocumentLinks(links);
+
         // TODO: Haal ook chatmappen en chatsessies op indien nodig
 
       } catch (error) {
@@ -45,20 +99,20 @@ const DashboardPage = () => {
     };
 
     fetchInitialData();
-  }, []); // De lege afhankelijkheids-array zorgt dat dit maar één keer gebeurt bij de initiële render
+  }, []);
   
   const getActiveContextDocuments = () => {
     const activeFolderIds = activeContextDocFolders.map(folder => folder.id);
     
     // Documenten uit geselecteerde algemene mappen
     const folderContextDocs = documents.filter(doc => {
-      const docFolderId = doc.folderId === undefined ? -1 : doc.folderId;
+      const docFolderId = doc.documentFolderId === undefined ? -1 : doc.documentFolderId;
       return activeFolderIds.includes(docFolderId);
     });
 
-    // Documenten uit de opgeslagen, actieve chat
+    // Documenten uit de actieve chat (via koppelingen)
     const chatContextDocs = selectedChatId
-      ? documents.filter(doc => doc.folderId === selectedChatId)
+      ? getActiveContextDocumentsForChat(selectedChatId)
       : [];
 
     // Documenten die zijn geüpload in de huidige, nieuwe (nog niet opgeslagen) chat
@@ -75,24 +129,30 @@ const DashboardPage = () => {
   };
 
   const handleUploadDocument = (newDoc: Document) => {
-  setTimeout(() => {
-    const savedDoc = { ...newDoc, id: Date.now() + Math.random() };
-    setDocuments(prev => [...prev, savedDoc]);
+    setTimeout(() => {
+      const savedDoc = { ...newDoc, id: Date.now() + Math.random() };
+      setDocuments(prev => [...prev, savedDoc]);
 
-    // BIJGEWERKTE LOGICA HIERONDER
-    // Als we in een nieuwe chat zijn (geen geselecteerde chat ID),
-    // voeg het ID van het document toe aan onze tijdelijke lijst.
-    if (selectedChatId === null) {
-      setNewChatDocumentIds(prev => [...prev, savedDoc.id]);
-    }
-  }, 500);
+      // Als we in een nieuwe chat zijn (geen geselecteerde chat ID),
+      // voeg het ID van het document toe aan onze tijdelijke lijst.
+      if (selectedChatId === null) {
+        setNewChatDocumentIds(prev => [...prev, savedDoc.id]);
+      } else {
+        // Als we in een bestaande chat zijn, koppel direct
+        linkDocumentToChat(savedDoc.id, selectedChatId, true);
+      }
+    }, 500);
   };
 
   const handleRemoveDocument = (documentId: number) => {
     if (confirm("Weet je zeker dat je dit document wilt verwijderen?")) {
-      // Dit simuleert een DELETE-verzoek aan je back-end
       setTimeout(() => {
         setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+        // Verwijder ook alle koppelingen van dit document
+        setChatDocumentLinks(prev => 
+          prev.filter(link => link.documentId !== documentId)
+        );
+        setNewChatDocumentIds(prev => prev.filter(id => id !== documentId));
       }, 500);
     }
   };
@@ -125,58 +185,28 @@ const DashboardPage = () => {
   };
 
   const handleNewChat = () => {
-    if (currentChat.some(msg => msg.type === 'user')) {
-      if (!selectedChatId) {
-        // Nieuwe (tijdelijke) chat opslaan
-        const firstUserMessage = currentChat.find(msg => msg.type === 'user');
-        if (firstUserMessage) {
-          const newChatSession: ChatSession = {
-            id: Date.now(),
-            title: generateChatTitle(firstUserMessage.content),
-            timestamp: formatTimestamp(new Date()),
-            preview: generatePreview(currentChat),
-            messages: [...currentChat],
-            createdAt: new Date(),
-            folderId: currentActiveChatFolder || undefined,
-          };
+    // Alleen opslaan als er nog geen selectedChatId is (dus tijdelijke chat)
+    // EN er zijn berichten van gebruiker
+    if (currentChat.some(msg => msg.type === 'user') && !selectedChatId) {
+      const firstUserMessage = currentChat.find(msg => msg.type === 'user');
+      if (firstUserMessage) {
+        const newChatSession: ChatSession = {
+          id: Date.now(),
+          title: generateChatTitle(firstUserMessage.content),
+          timestamp: formatTimestamp(new Date()),
+          preview: generatePreview(currentChat),
+          messages: [...currentChat],
+          createdAt: new Date(),
+          chatFolderId: currentActiveChatFolder || undefined,
+        };
 
-          setChatSessions(prev => [newChatSession, ...prev]);
+        setChatSessions(prev => [newChatSession, ...prev]);
 
-          // Documenten koppelen aan nieuwe chat
-          if (newChatDocumentIds.length > 0) {
-            setDocuments(prevDocs =>
-              prevDocs.map(doc =>
-                newChatDocumentIds.includes(doc.id)
-                  ? { ...doc, folderId: newChatSession.id }
-                  : doc
-              )
-            );
-          }
-        }
-      } else {
-        // Bestaande chat updaten
-        setChatSessions(prev =>
-          prev.map(chat =>
-            chat.id === selectedChatId
-              ? {
-                  ...chat,
-                  messages: [...currentChat],
-                  timestamp: formatTimestamp(new Date()),
-                  preview: generatePreview(currentChat),
-                }
-              : chat
-          )
-        );
-
-        // Documenten koppelen aan bestaande chat
+        // Koppel documenten aan nieuwe chat via ChatDocumentLink
         if (newChatDocumentIds.length > 0) {
-          setDocuments(prevDocs =>
-            prevDocs.map(doc =>
-              newChatDocumentIds.includes(doc.id)
-                ? { ...doc, folderId: selectedChatId }
-                : doc
-            )
-          );
+          newChatDocumentIds.forEach(docId => {
+            linkDocumentToChat(docId, newChatSession.id, true);
+          });
         }
       }
     }
@@ -220,13 +250,36 @@ const DashboardPage = () => {
 
   const handleSendMessage = async (newMessage: Message) => {
     // Stap 1: Voeg het bericht van de gebruiker toe aan de chat
-    setCurrentChat(prev => [...prev, newMessage]);
+    const updatedChat = [...currentChat, newMessage];
+    setCurrentChat(updatedChat);
     setIsLoading(true);
+
+    // AUTO-SAVE: nieuwe chat bij eerste bericht
+    if (!selectedChatId && updatedChat.length === 1) {
+      const newChatSession: ChatSession = {
+        id: Date.now(),
+        title: generateChatTitle(newMessage.content),
+        timestamp: formatTimestamp(new Date()),
+        preview: generatePreview(updatedChat),
+        messages: [...updatedChat],
+        createdAt: new Date(),
+        chatFolderId: currentActiveChatFolder || undefined,
+      };
+
+      setChatSessions(prev => [newChatSession, ...prev]);
+      setSelectedChatId(newChatSession.id);
+
+      // Koppel documenten aan nieuwe chat via ChatDocumentLink
+      if (newChatDocumentIds.length > 0) {
+        newChatDocumentIds.forEach(docId => {
+          linkDocumentToChat(docId, newChatSession.id, true);
+        });
+        setNewChatDocumentIds([]); // Reset na koppeling
+      }
+    }
 
     // Stap 2: Bepaal welke documenten relevant zijn voor de context
     const relevantDocuments = getActiveContextDocuments();
-
-    // Toon de ID's van de documenten die als context worden gebruikt
     console.log("Actieve context document ID's:", relevantDocuments.map(doc => doc.id));
 
     try {
@@ -255,7 +308,25 @@ const DashboardPage = () => {
         content: data.answer,
         timestamp: new Date()
       };
-      setCurrentChat(prev => [...prev, botResponse]);
+      
+      const finalChat = [...updatedChat, botResponse];
+      setCurrentChat(finalChat);
+
+      // Update bestaande chat in chatSessions
+      if (selectedChatId) {
+        setChatSessions(prev =>
+          prev.map(chat =>
+            chat.id === selectedChatId
+              ? {
+                  ...chat,
+                  messages: finalChat,
+                  timestamp: formatTimestamp(new Date()),
+                  preview: generatePreview(finalChat),
+                }
+              : chat
+          )
+        );
+      }
 
     } catch (error) {
       console.error("Fout bij het ophalen van RAG-antwoord:", error);
@@ -265,19 +336,28 @@ const DashboardPage = () => {
         content: "Excuses, ik kon geen antwoord genereren. Probeer het later opnieuw.",
         timestamp: new Date()
       };
-      setCurrentChat(prev => [...prev, errorMessage]);
+      
+      const finalChat = [...updatedChat, errorMessage];
+      setCurrentChat(finalChat);
+
+      // Update bestaande chat in chatSessions bij fout
+      if (selectedChatId) {
+        setChatSessions(prev =>
+          prev.map(chat =>
+            chat.id === selectedChatId
+              ? {
+                  ...chat,
+                  messages: finalChat,
+                  timestamp: formatTimestamp(new Date()),
+                  preview: generatePreview(finalChat),
+                }
+              : chat
+          )
+        );
+      }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const update2Timestamps = () => {
-    setChatSessions(prev => 
-      prev.map(chat => ({
-        ...chat,
-        timestamp: formatTimestamp(chat.createdAt)
-      }))
-    );
   };
 
   const getCurrentActiveFolder = () => {
@@ -287,9 +367,9 @@ const DashboardPage = () => {
   const getSidebarChats = () => {
     return chatSessions.filter(chat => {
       if (currentActiveChatFolder === null) {
-        return !chat.folderId;
+        return !chat.chatFolderId;
       }
-      return chat.folderId === currentActiveChatFolder;
+      return chat.chatFolderId === currentActiveChatFolder;
     });
   };
 
@@ -307,10 +387,24 @@ const DashboardPage = () => {
     if (confirm("Weet je zeker dat je deze chat wilt verwijderen? Dit kan niet ongedaan gemaakt worden.")) {
       setChatSessions(prev => prev.filter(chat => chat.id !== chatId));
       
+      // Verwijder ook alle document koppelingen van deze chat
+      setChatDocumentLinks(prev => prev.filter(link => link.chatId !== chatId));
+      
       if (selectedChatId === chatId) {
         setSelectedChatId(null);
         setCurrentChat([]);
       }
+    }
+  };
+
+  // Helper functie voor ChatInterface om gekoppelde documenten te tonen
+  const getUploadedDocumentsForCurrentChat = () => {
+    if (selectedChatId === null) {
+      // Nieuwe chat: toon tijdelijk geüploade documenten
+      return documents.filter(doc => newChatDocumentIds.includes(doc.id));
+    } else {
+      // Bestaande chat: toon gekoppelde documenten
+      return getDocumentsForChat(selectedChatId);
     }
   };
   
@@ -358,10 +452,7 @@ const DashboardPage = () => {
               activeChatId={selectedChatId} 
               onRemoveDocument={handleRemoveDocument}
               isLoading={isLoading}
-              uploadedDocuments={getActiveContextDocuments().filter(doc => 
-                (selectedChatId === null && newChatDocumentIds.includes(doc.id)) ||
-                (selectedChatId !== null && doc.folderId === selectedChatId)
-              )}
+              uploadedDocuments={getUploadedDocumentsForCurrentChat()}
             />
           ) : viewMode === 'documents' ? (
             <DocumentViewer 

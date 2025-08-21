@@ -72,7 +72,7 @@ const DocumentViewer = ({
 
     // 3. Verplaats de documenten terug naar de algemene map
     const updatedDocuments = documents.map(doc => 
-      doc.folderId === folderId ? { ...doc, folderId: undefined } : doc
+      doc.documentFolderId === folderId ? { ...doc, documentFolderId: undefined } : doc
     );
     onUpdateDocuments(updatedDocuments);
     
@@ -85,7 +85,7 @@ const DocumentViewer = ({
   const moveDocumentsToFolder = (folderId: number | null) => {
     const updatedDocuments = documents.map(doc => 
       selectedDocuments.includes(doc.id) 
-        ? { ...doc, folderId: folderId || undefined }
+        ? { ...doc, documentFolderId: folderId || undefined }
         : doc
     );
     onUpdateDocuments(updatedDocuments);
@@ -106,7 +106,7 @@ const DocumentViewer = ({
         type: file.name.split('.').pop()?.toUpperCase() || 'BESTAND',
         size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
         uploadedAt: new Date(),
-        folderId: selectedFolder || undefined,
+        documentFolderId: selectedFolder || undefined,
       }));
       
       onUpdateDocuments([...documents, ...newDocs]);
@@ -150,7 +150,7 @@ const DocumentViewer = ({
     if (draggedDocumentId !== null) {
       const updatedDocuments = documents.map(doc => 
         doc.id === draggedDocumentId 
-          ? { ...doc, folderId: targetFolderId || undefined }
+          ? { ...doc, documentFolderId: targetFolderId || undefined }
           : doc
       );
       onUpdateDocuments(updatedDocuments);
@@ -187,9 +187,9 @@ const DocumentViewer = ({
 
   const getFilteredDocuments = () => {
     if (selectedFolder === null) {
-      return documents.filter(doc => !doc.folderId);
+      return documents.filter(doc => !doc.documentFolderId);
     } else {
-      return documents.filter(doc => doc.folderId === selectedFolder);
+      return documents.filter(doc => doc.documentFolderId === selectedFolder);
     }
   };
   
@@ -309,7 +309,7 @@ const DocumentViewer = ({
                 <div className="flex-1">
                   <span className="font-medium">Algemene documenten</span>
                   <p className="text-xs text-gray-500">
-                    {documents.filter(doc => !doc.folderId).length} documenten
+                    {documents.filter(doc => !doc.documentFolderId).length} documenten
                   </p>
                 </div>
               </div>
@@ -348,7 +348,7 @@ const DocumentViewer = ({
                     <div className="flex-1 min-w-0">
                       <span className="font-medium truncate">{folder.name}</span>
                       <p className="text-xs opacity-75">
-                        {documents.filter(doc => doc.folderId === folder.id).length} documenten
+                        {documents.filter(doc => doc.documentFolderId === folder.id).length} documenten
                       </p>
                     </div>
                   </div>

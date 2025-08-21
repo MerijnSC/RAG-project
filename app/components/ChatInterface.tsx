@@ -102,7 +102,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       type: file.type || file.name.split('.').pop() || 'BESTAND',
       size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       uploadedAt: new Date(),
-      folderId: activeChatId ? activeChatId : undefined, 
+      documentFolderId: activeChatId ? activeChatId : undefined, 
     };
 
     setTimeout(() => {
