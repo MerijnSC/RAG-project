@@ -26,12 +26,12 @@ const DocumentViewer = ({
   const [selectedDocument, setSelectedDocument] = useState<Document | null>(null);
   
   const folderColors = [
-    'bg-blue-100 text-blue-800 border-blue-200',
-    'bg-sky-100 text-sky-800 border-sky-200',
-    'bg-cyan-100 text-cyan-800 border-cyan-200',
-    'bg-indigo-100 text-indigo-800 border-indigo-200',
-    'bg-blue-200 text-blue-900 border-blue-300',
-    'bg-sky-200 text-sky-900 border-sky-300'
+    'bg-sky-100 dark:bg-sky-900/30 text-sky-800 dark:text-sky-200 border-sky-200 dark:border-sky-700',
+    'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-200 border-cyan-200 dark:border-cyan-700',
+    'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700',
+    'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 border-indigo-200 dark:border-indigo-700',
+    'bg-blue-200 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-600',
+    'bg-sky-200 dark:bg-sky-900/40 text-sky-900 dark:text-sky-100 border-sky-300 dark:border-sky-600'
   ];
 
   const formatDate = (date: Date) => {
@@ -201,23 +201,23 @@ const DocumentViewer = ({
   const isGeneralActive = activeContextFolders.some(f => f.id === -1); // -1 is de ID voor de algemene map
   
   return (
-    <div className="h-full flex flex-col bg-white">
+    <div className="h-full flex flex-col bg-white dark:bg-gray-900">
       {/* Header */}
-      <div className="border-b border-gray-200 p-4">
+      <div className="border-b border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <button
               onClick={onBack}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
             </button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
                 Achtergrond informatie
               </h1>
               {selectedFolderData && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Map: {selectedFolderData.name}
                 </p>
               )}
@@ -227,19 +227,19 @@ const DocumentViewer = ({
           <div className="flex items-center space-x-2">
             {selectedDocuments.length > 0 && (
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {selectedDocuments.length} geselecteerd
                 </span>
                 <button
                   onClick={() => setIsMovingDocuments(true)}
-                  className="flex items-center space-x-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                 >
                   <Move className="w-4 h-4" />
                   <span>Verplaats</span>
                 </button>
                 <button
                   onClick={() => setSelectedDocuments([])}
-                  className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   Annuleer
                 </button>
@@ -248,7 +248,7 @@ const DocumentViewer = ({
             
             <button
               onClick={() => setIsCreatingFolder(true)}
-              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
             >
               <FolderPlus className="w-4 h-4" />
               <span>Nieuwe Map</span>
@@ -266,8 +266,8 @@ const DocumentViewer = ({
               <label
                 htmlFor="file-upload"
                 className={`
-                  flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg
-                  hover:bg-blue-700 transition-colors cursor-pointer
+                  flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg
+                  transition-colors cursor-pointer
                   ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}
                 `}
               >
@@ -282,9 +282,9 @@ const DocumentViewer = ({
       {/* Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Folders Sidebar */}
-        <div className="w-80 border-r border-gray-200 overflow-y-auto">
+        <div className="w-80 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-gray-900">
           <div className="p-4">
-            <h2 className="text-sm font-medium text-gray-500 mb-4 uppercase tracking-wide">
+            <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wide">
               Mappen
             </h2>
             
@@ -299,27 +299,27 @@ const DocumentViewer = ({
               onDrop={(e) => handleDrop(e, null)}
               className={`flex items-center justify-between space-x-3 p-3 rounded-lg cursor-pointer transition-colors mb-2 border ${
                 selectedFolder === null
-                  ? 'bg-blue-50 border-blue-200 text-blue-700'
+                  ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300'
                   : dragOverFolderId === null && draggedDocumentId !== null
-                  ? 'bg-green-50 border-green-300 border-dashed'
-                  : 'hover:bg-gray-50 border-transparent'
+                  ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-600 border-dashed'
+                  : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-transparent'
               }`}
             >
               <div className="flex items-center space-x-3">
-                <FileText className="w-5 h-5" />
+                <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                 <div className="flex-1">
-                  <span className="font-medium">Algemene documenten</span>
-                  <p className="text-xs text-gray-500">
+                  <span className="font-medium text-gray-900 dark:text-gray-100">Algemene documenten</span>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {documents.filter(doc => !doc.documentFolderId).length} documenten
                   </p>
                 </div>
               </div>
-              <div className="p-1 text-green-600">
+              <div className="p-1 text-green-600 dark:text-green-400">
                 <CheckCircle className="w-5 h-5" />
               </div>
             </div>
 
-            <hr className="my-4" />
+            <hr className="my-4 border-gray-200 dark:border-gray-700" />
             
             {/* Custom folders */}
             {docFolders.map(folder => {
@@ -331,8 +331,8 @@ const DocumentViewer = ({
                     selectedFolder === folder.id
                       ? folder.color
                       : dragOverFolderId === folder.id && draggedDocumentId !== null
-                      ? 'bg-green-50 border-green-300 border-dashed'
-                      : 'hover:bg-gray-50 border-transparent'
+                      ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-600 border-dashed'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-transparent'
                   }`}
                   onDragOver={(e) => handleDragOver(e, folder.id)}
                   onDragLeave={handleDragLeave}
@@ -345,9 +345,12 @@ const DocumentViewer = ({
                     }}
                     className="flex-1 flex items-center space-x-3 min-w-0"
                   >
-                    <Folder className="w-5 h-5" />
+                    <Folder className="w-5 h-5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <span className="font-medium truncate">{folder.name}</span>
+                      {/* Adjusted here: wrap text instead of truncate */}
+                      <span className="font-medium break-words line-clamp-2">
+                        {folder.name}
+                      </span>
                       <p className="text-xs opacity-75">
                         {documents.filter(doc => doc.documentFolderId === folder.id).length} documenten
                       </p>
@@ -359,7 +362,11 @@ const DocumentViewer = ({
                         e.stopPropagation();
                         toggleActiveContext(folder);
                       }}
-                      className={`p-1 rounded-full transition-colors ${isActive ? 'bg-green-100 text-green-600' : 'text-gray-400 hover:bg-gray-200'}`}
+                      className={`p-1 rounded-full transition-colors ${
+                        isActive 
+                          ? 'bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400' 
+                          : 'text-gray-400 dark:text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700'
+                      }`}
                     >
                       <CheckCircle className="w-4 h-4" />
                     </button>
@@ -370,18 +377,19 @@ const DocumentViewer = ({
                           deleteFolder(folder.id);
                         }
                       }}
-                      className="p-1 hover:bg-red-100 rounded-full transition-colors"
+                      className="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded-full transition-colors"
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
                     </button>
                   </div>
                 </div>
               );
             })}
 
+
             {/* Create folder form */}
             {isCreatingFolder && (
-              <div className="p-3 border border-gray-300 rounded-lg shadow">
+              <div className="p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 rounded-lg shadow">
                 <input
                   type="text"
                   placeholder="Map naam..."
@@ -394,13 +402,13 @@ const DocumentViewer = ({
                       setNewFolderName('');
                     }
                   }}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
+                  className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
                   autoFocus
                 />
                 <div className="flex space-x-2">
                   <button
                     onClick={createFolder}
-                    className="flex-1 px-2 py-1 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    className="flex-1 px-2 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded-lg"
                   >
                     Maak aan
                   </button>
@@ -409,7 +417,7 @@ const DocumentViewer = ({
                       setIsCreatingFolder(false);
                       setNewFolderName('');
                     }}
-                    className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded-lg hover:bg-gray-100"
+                    className="flex-1 px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
                     Annuleer
                   </button>
@@ -419,8 +427,8 @@ const DocumentViewer = ({
             
             {/* Drag instruction */}
             {draggedDocumentId !== null && (
-              <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-                <p className="text-sm text-purple-700">
+              <div className="mt-4 p-3 bg-purple-50 dark:bg-purple-900/30 border border-purple-200 dark:border-purple-700 rounded-lg">
+                <p className="text-sm text-purple-700 dark:text-purple-300">
                   Sleep naar een map om het document te verplaatsen
                 </p>
               </div>
@@ -429,21 +437,21 @@ const DocumentViewer = ({
         </div>
 
         {/* Document List */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {selectedFolderData ? selectedFolderData.name : 'Algemene documenten'}
               </h2>
             </div>
             
             {filteredDocuments.length === 0 ? (
               <div className="text-center py-12">
-                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 mb-2">
+                <FileText className="w-12 h-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+                <p className="text-gray-500 dark:text-gray-400 mb-2">
                   {selectedFolderData ? 'Geen documenten in deze map' : 'Geen documenten geüpload'}
                 </p>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-400 dark:text-gray-500">
                   Upload bestanden of verplaats ze naar deze map
                 </p>
               </div>
@@ -458,10 +466,10 @@ const DocumentViewer = ({
                     className={`
                       p-3 border rounded-lg cursor-move transition-all
                       ${selectedDocuments.includes(doc.id)
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
                         : draggedDocumentId === doc.id
                         ? 'opacity-50 transform scale-95'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
                       }
                     `}
                   >
@@ -477,17 +485,17 @@ const DocumentViewer = ({
                         className="flex items-start space-x-3 flex-1 min-w-0"
                         onClick={() => setSelectedDocument(doc)}
                       >
-                        <FileText className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-medium text-gray-900 truncate">
+                          <h3 className="font-medium text-gray-900 dark:text-gray-100 truncate">
                             {doc.name}
                           </h3>
                           <div className="flex items-center space-x-2 mt-1">
-                            <span className="text-xs text-gray-500">{doc.type}</span>
-                            <span className="text-xs text-gray-400">•</span>
-                            <span className="text-xs text-gray-500">{doc.size}</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{doc.type}</span>
+                            <span className="text-xs text-gray-400 dark:text-gray-500">•</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">{doc.size}</span>
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                             {formatDate(doc.uploadedAt)}
                           </p>
                         </div>
@@ -500,9 +508,9 @@ const DocumentViewer = ({
                             handleDeleteDocument(doc.id);
                           }
                         }}
-                        className="p-1 hover:bg-red-100 rounded transition-colors"
+                        className="p-1 hover:bg-red-100 dark:hover:bg-red-900/40 rounded transition-colors"
                       >
-                        <Trash2 className="w-4 h-4 text-red-500" />
+                        <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
                       </button>
                     </div>
                   </div>
@@ -513,25 +521,25 @@ const DocumentViewer = ({
         </div>
 
         {/* Document Preview */}
-        <div className="hidden lg:block w-1/2">
+        <div className="hidden lg:block w-1/2 border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
           <DocumentPreview document={selectedDocument} />
         </div>
       </div>
 
       {/* Move documents modal */}
       {isMovingDocuments && (
-        <div className="fixed inset-0 bg-gradient-to-br from-blue-600 to-indigo-100 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-h-96 overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Verplaats naar map</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-h-96 overflow-y-auto shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Verplaats naar map</h3>
             
             <div className="space-y-2 mb-4">
               <div
                 onClick={() => moveDocumentsToFolder(null)}
-                className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
               >
                 <div className="flex items-center space-x-2">
-                  <FileText className="w-5 h-5" />
-                  <span>Algemene documenten</span>
+                  <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                  <span className="text-gray-900 dark:text-gray-100">Algemene documenten</span>
                 </div>
               </div>
               
@@ -552,7 +560,7 @@ const DocumentViewer = ({
             <div className="flex space-x-2">
               <button
                 onClick={() => setIsMovingDocuments(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
               >
                 Annuleer
               </button>
