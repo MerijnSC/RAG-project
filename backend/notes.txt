@@ -1,0 +1,57 @@
+
+SETUP
+
+Agentic RAG on directory of documents
+
+Tools:
+    Exact search
+        Search for keywords in folders, documents, sets of documents.
+        Ranks documents on hits
+        Ability to scan areas of N tokens around keywords
+
+    Semantic search
+        Search with words, phrases, sentences, questions in folders, documents, sets of documents.
+        Ranks documents on semantic similarity.
+
+        
+
+
+Agent receives question to answer. Does semantic search to get information.
+Semantic search with query on sentence embedding. Return top N sentences.
+Pool 
+
+
+
+
+1. Upload doc
+2. Docling process
+3. Embed
+4. Chunk
+5. Store
+
+
+
+
+
+
+
+
+Filetypes to be able to process:
+1. .pdf             — Very common for reports, papers, forms; rich but sometimes tricky to parse
+2. .doc` / `.docx   — Standard for business and legal documents
+3. .txt             — Simple, raw text files; easy to handle and often used for notes or logs
+4. .csv             — Common for tabular data; often structured input
+5. .json            — Key for structured or semi-structured data, config, APIs
+6. .html` / `.htm   — Important for web scraping and web documents
+7. .ppt` / `.pptx   — Presentations, less frequent but useful in business contexts
+8. .xls` / `.xlsx   — Spreadsheets, widely used but require parsing
+9. .yaml` / `.xml   — Semi-structured formats, more niche but important in config/data interchange
+10. .odt            — OpenDocument text, less common than Word files
+11. .rtf            — Rarely used nowadays, but still encountered
+12. .mhtml          — Archived webpages; fairly niche
+13. .epub` / `.mobi — Ebook formats; less common for RAG tasks
+14. .tex            — Scientific/technical documents source; very niche
+
+
+
+
