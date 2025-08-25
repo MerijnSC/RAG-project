@@ -31,3 +31,7 @@ Thumbs.db
 
 # Optional: coverage reports
 /frontend/coverage/
+
+# Backend Python cache and session
+/backend/__pycache__/
+/backend/flask_session/

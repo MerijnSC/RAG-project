@@ -77,17 +77,17 @@ const DashboardPage = () => {
     const fetchInitialData = async () => {
       try {
         // Haal documenten op
-        const docsResponse = await fetch('/api/documents');
+        const docsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents`);
         const docs = await docsResponse.json();
         setDocuments(docs);
         
         // Haal documentmappen op
-        const foldersResponse = await fetch('/api/folders');
+        const foldersResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/folders`);
         const folders = await foldersResponse.json();
         setDocumentFolders(folders);
 
         // Haal chat-document koppelingen op
-        const linksResponse = await fetch('/api/chat-document-links');
+        const linksResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat-document-links`);
         const links = await linksResponse.json();
         setChatDocumentLinks(links);
 
@@ -254,7 +254,21 @@ const DashboardPage = () => {
     setCurrentChat(updatedChat);
     setIsLoading(true);
 
+    // Create bot message with empty content that will be updated as stream comes in
+    const botMessageId = Date.now() + 1;
+    const botResponse: Message = {
+      id: botMessageId,
+      type: 'bot',
+      content: '',
+      timestamp: new Date()
+    };
+    
+    // Add empty bot message to chat immediately
+    const chatWithEmptyBot = [...updatedChat, botResponse];
+    setCurrentChat(chatWithEmptyBot);
+
     // AUTO-SAVE: nieuwe chat bij eerste bericht
+    let currentChatId = selectedChatId;
     if (!selectedChatId && updatedChat.length === 1) {
       const newChatSession: ChatSession = {
         id: Date.now(),
@@ -268,6 +282,7 @@ const DashboardPage = () => {
 
       setChatSessions(prev => [newChatSession, ...prev]);
       setSelectedChatId(newChatSession.id);
+      currentChatId = newChatSession.id;
 
       // Koppel documenten aan nieuwe chat via ChatDocumentLink
       if (newChatDocumentIds.length > 0) {
@@ -283,14 +298,14 @@ const DashboardPage = () => {
     console.log("Actieve context document ID's:", relevantDocuments.map(doc => doc.id));
 
     try {
-      // Stap 3: Roep je back-end RAG API aan
-      const response = await fetch('/api/rag', {
+      // Stap 3: Roep je back-end RAG API aan met streaming
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/send_message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: newMessage.content,
+          message: newMessage.content,
           contextDocumentIds: relevantDocuments.map(doc => doc.id)
         }),
       });
@@ -299,24 +314,74 @@ const DashboardPage = () => {
         throw new Error('Netwerkrespons was niet ok');
       }
 
-      const data = await response.json();
-      
-      // Stap 4: Maak het antwoord van de bot en voeg het toe aan de chat
-      const botResponse: Message = {
-        id: Date.now() + 1,
-        type: 'bot',
-        content: data.answer,
-        timestamp: new Date()
+      // Handle streaming response
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          if (done) {
+            break;
+          }
+
+          // Decode the chunk and add to accumulated content
+          const chunk = decoder.decode(value, { stream: true });
+          accumulatedContent += chunk;
+
+          // Update the bot message content in real-time
+          setCurrentChat(prevChat => 
+            prevChat.map(msg => 
+              msg.id === botMessageId 
+                ? { ...msg, content: accumulatedContent }
+                : msg
+            )
+          );
+
+          // Update the chat session in real-time if we have a selected chat
+          if (currentChatId) {
+            setChatSessions(prev =>
+              prev.map(chat =>
+                chat.id === currentChatId
+                  ? {
+                      ...chat,
+                      messages: chat.messages.map(msg => 
+                        msg.id === botMessageId 
+                          ? { ...msg, content: accumulatedContent }
+                          : msg
+                      ).length === chat.messages.length 
+                        ? [...chat.messages, { ...botResponse, content: accumulatedContent }]
+                        : chat.messages.map(msg => 
+                            msg.id === botMessageId 
+                              ? { ...msg, content: accumulatedContent }
+                              : msg
+                          ),
+                      timestamp: formatTimestamp(new Date()),
+                      preview: generatePreview([...updatedChat, { ...botResponse, content: accumulatedContent }]),
+                    }
+                  : chat
+              )
+            );
+          }
+        }
+      }
+
+      // Final update with complete message
+      const finalBotResponse: Message = {
+        ...botResponse,
+        content: accumulatedContent
       };
-      
-      const finalChat = [...updatedChat, botResponse];
+
+      const finalChat = [...updatedChat, finalBotResponse];
       setCurrentChat(finalChat);
 
-      // Update bestaande chat in chatSessions
-      if (selectedChatId) {
+      // Final update to chat sessions
+      if (currentChatId) {
         setChatSessions(prev =>
           prev.map(chat =>
-            chat.id === selectedChatId
+            chat.id === currentChatId
               ? {
                   ...chat,
                   messages: finalChat,
@@ -331,7 +396,7 @@ const DashboardPage = () => {
     } catch (error) {
       console.error("Fout bij het ophalen van RAG-antwoord:", error);
       const errorMessage: Message = {
-        id: Date.now() + 1,
+        id: botMessageId,
         type: 'bot',
         content: "Excuses, ik kon geen antwoord genereren. Probeer het later opnieuw.",
         timestamp: new Date()
@@ -341,10 +406,10 @@ const DashboardPage = () => {
       setCurrentChat(finalChat);
 
       // Update bestaande chat in chatSessions bij fout
-      if (selectedChatId) {
+      if (currentChatId) {
         setChatSessions(prev =>
           prev.map(chat =>
-            chat.id === selectedChatId
+            chat.id === currentChatId
               ? {
                   ...chat,
                   messages: finalChat,
