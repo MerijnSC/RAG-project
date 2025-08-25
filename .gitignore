@@ -34,4 +34,9 @@ Thumbs.db
 
 # Backend Python cache and session
 /backend/__pycache__/
+/backend/chat/__pycache__/
 /backend/flask_session/
+
+
+# OPENAI Keys
+/backend/chat/keys.py
