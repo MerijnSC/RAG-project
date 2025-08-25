@@ -161,7 +161,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           <Menu className="w-6 h-6 text-gray-600 dark:text-gray-300" />
         </button>
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center">
             <Snail className="w-5 h-5 text-white" />
           </div>
           <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">AI Assistant</h1>
@@ -176,11 +176,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <div className={`flex max-w-xs lg:max-w-md ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
               <div className={`rounded-2xl px-4 py-2 ${
                 message.type === 'user'
-                  ? 'bg-blue-600 text-white text-lg rounded-br-md'
+                  ? 'bg-orange-600 text-white text-lg rounded-br-md'
                   : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-md border border-gray-200 dark:border-gray-700'
               }`}>
                 <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-1 ${message.type === 'user' ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+                <p className={`text-xs mt-1 ${message.type === 'user' ? 'text-orange-100' : 'text-gray-500 dark:text-gray-400'}`}>
                   {formatTime(message.timestamp)}
                 </p>
               </div>
@@ -211,7 +211,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         <div className="px-6">
           <div className="max-w-3xl mx-auto py-3">
             {uploadStatus === 'uploading' && (
-              <div className="flex items-center space-x-2 text-blue-600 mb-3">
+              <div className="flex items-center space-x-2 text-orange-600 mb-3">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span className="text-sm">Bestand uploaden...</span>
               </div>
@@ -221,8 +221,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <div className="space-y-2">
                 <div className="flex flex-wrap gap-2">
                   {uploadedDocuments.map(document => (
-                    <div key={document.id} className="bg-gray-100 dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded-lg px-3 py-2 flex items-center space-x-2 group shadow-sm hover:shadow-md transition-shadow">
-                      <FileText className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <div key={document.id} className="bg-gray-100 dark:bg-gray-800 border border-orange-200 dark:border-orange-700 rounded-lg px-3 py-2 flex items-center space-x-2 group shadow-sm hover:shadow-md transition-shadow">
+                      <FileText className="w-4 h-4 text-orange-600 flex-shrink-0" />
                       <div className="flex flex-col min-w-0">
                         <span className="text-sm text-gray-800 dark:text-gray-200 truncate max-w-[150px]" title={document.name}>
                           {document.name}
@@ -262,14 +262,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               placeholder={isDragOver ? "Sleep je bestand hier..." : "Typ je vraag hier..."}
               disabled={isLoading}
               rows={1}
-              className={`w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none overflow-y-auto min-h-[48px] max-h-[120px] hide-scrollbar leading-normal transition-all ${
-                isDragOver ? 'border-blue-400 bg-blue-50 dark:bg-blue-900/30' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100'
+              className={`w-full px-4 py-3 pr-12 border border-gray-300 dark:border-gray-700 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none overflow-y-auto min-h-[48px] max-h-[120px] hide-scrollbar leading-normal transition-all ${
+                isDragOver ? 'border-orange-400 bg-orange-50 dark:bg-orange-900/30' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100'
               }`}
             />
             
             {isDragOver && (
-              <div className="absolute inset-0 bg-blue-50 dark:bg-blue-900/30 bg-opacity-80 border-2 border-dashed border-blue-400 rounded-2xl flex items-center justify-center pointer-events-none">
-                <div className="flex flex-col items-center space-y-2 text-blue-600 dark:text-blue-400">
+              <div className="absolute inset-0 bg-orange-50 dark:bg-orange-900/30 bg-opacity-80 border-2 border-dashed border-orange-400 rounded-2xl flex items-center justify-center pointer-events-none">
+                <div className="flex flex-col items-center space-y-2 text-orange-600 dark:text-orange-400">
                   <Upload className="w-6 h-6" />
                   <span className="text-sm font-medium">Sleep bestand hier</span>
                 </div>
@@ -281,7 +281,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <button
               onClick={handleDocumentButtonClick}
               disabled={isLoading || uploadStatus === 'uploading'}
-              className="bg-white dark:bg-gray-800 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white rounded-full p-3 transition-colors duration-200 flex items-center justify-center flex-shrink-0 h-12 w-12 self-start disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-white dark:bg-gray-800 border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white rounded-full p-3 transition-colors duration-200 flex items-center justify-center flex-shrink-0 h-12 w-12 self-start disabled:opacity-50 disabled:cursor-not-allowed"
               title={`Document uploaden (${allowedTypes.join(', ')} - max ${maxFileSize / (1024 * 1024)}MB)`}
             >
               {uploadStatus === 'uploading' ? (
@@ -301,7 +301,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <button
               onClick={handleSend}
               disabled={!input.trim() || isLoading}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-3 transition-colors duration-200 flex items-center justify-center flex-shrink-0 h-12 w-12 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="bg-orange-600 hover:bg-orange-700 text-white rounded-full p-3 transition-colors duration-200 flex items-center justify-center flex-shrink-0 h-12 w-12 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Bericht versturen"
             >
               <Forward className="w-6 h-6" />

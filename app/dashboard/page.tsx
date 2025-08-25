@@ -9,8 +9,8 @@ import Footer from '../components/Footer';
 import { Message, ChatSession, ChatFolder, Document, DocumentFolder, ViewMode, ChatDocumentLink } from '../types/chat';
 
 const DashboardPage = () => {
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]); 
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [chatFolders, setChatFolders] = useState<ChatFolder[]>([]);
   const [currentActiveChatFolder, setCurrentActiveChatFolder] = useState<number | null>(null);
   const [currentChat, setCurrentChat] = useState<Message[]>([]);

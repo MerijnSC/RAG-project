@@ -22,12 +22,12 @@ const ChatHistoryViewer = ({
   const [dragOverFolderId, setDragOverFolderId] = useState<number | null>(null);
 
   const folderColors = [
-    'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 border-blue-200 dark:border-blue-700',
-    'bg-sky-100 dark:bg-sky-900/30 text-sky-800 dark:text-sky-200 border-sky-200 dark:border-sky-700',
-    'bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-200 border-cyan-200 dark:border-cyan-700',
-    'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-200 border-indigo-200 dark:border-indigo-700',
-    'bg-blue-200 dark:bg-blue-900/40 text-blue-900 dark:text-blue-100 border-blue-300 dark:border-blue-600',
-    'bg-sky-200 dark:bg-sky-900/40 text-sky-900 dark:text-sky-100 border-sky-300 dark:border-sky-600'
+    'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-200 border-orange-200 dark:border-orange-700',
+    'bg-orange-200 dark:bg-orange-900/30 text-orange-900 dark:text-orange-100 border-orange-300 dark:border-orange-600',
+    'bg-orange-300 dark:bg-orange-800/30 text-orange-900 dark:text-orange-50 border-orange-400 dark:border-orange-500',
+    'bg-orange-400 dark:bg-orange-700/30 text-orange-950 dark:text-orange-50 border-orange-500 dark:border-orange-400',
+    'bg-orange-500 dark:bg-orange-600/30 text-white dark:text-orange-50 border-orange-600 dark:border-orange-300',
+    'bg-orange-50 dark:bg-orange-950/20 text-orange-900 dark:text-orange-100 border-orange-100 dark:border-orange-800'
   ];
   
   const createFolder = () => {
@@ -158,7 +158,7 @@ const ChatHistoryViewer = ({
                 </span>
                 <button
                   onClick={() => setIsMovingChats(true)}
-                  className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors"
                 >
                   <Move className="w-4 h-4" />
                   <span>Verplaats</span>
@@ -200,7 +200,7 @@ const ChatHistoryViewer = ({
               onDrop={(e) => handleDrop(e, null)}
               className={`flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors mb-2 border ${
                 selectedFolder === null
-                  ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300'
+                  ? 'bg-orange-50 dark:bg-orange-900/30 border-orange-200 dark:border-orange-700 text-orange-700 dark:text-orange-300'
                   : dragOverFolderId === null && draggedChatId !== null
                   ? 'bg-green-50 dark:bg-green-900/30 border-green-300 dark:border-green-600 border-dashed'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-800 border-transparent'
@@ -267,7 +267,7 @@ const ChatHistoryViewer = ({
                       setNewFolderName('');
                     }
                   }}
-                  className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
+                  className="w-full px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent mb-2"
                   autoFocus
                 />
                 <div className="flex space-x-2">
@@ -335,7 +335,7 @@ const ChatHistoryViewer = ({
                       draggedChatId === chat.id
                         ? 'opacity-50 transform scale-95'
                         : selectedChats.includes(chat.id)
-                        ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30'
+                        ? 'border-orange-500 dark:border-orange-400 bg-orange-50 dark:bg-orange-900/30'
                         : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >

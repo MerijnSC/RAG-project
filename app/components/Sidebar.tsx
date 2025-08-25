@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+          <div className="w-10 h-10 bg-orange-600 rounded-full flex items-center justify-center">
             <Snail className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -74,7 +74,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               onClick={item.action}
               className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors duration-200 ${
                 item.active 
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 border border-blue-200 dark:border-blue-700' 
+                  ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 border border-orange-200 dark:border-orange-700' 
                   : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
               }`}
             >
@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Actieve contextmappen */}
       {viewMode === 'chat' && (
-        <div className="px-4 mt-4">
+        <div className="px-4 mt-4 flex-1 overflow-y-auto">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <File className="w-6 h-6 text-gray-500 dark:text-gray-400" />
@@ -95,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <button 
               onClick={onManageContext} 
-              className="text-xs text-blue-600 hover:underline"
+              className="text-xs text-orange-600 hover:underline"
             >
               Beheer
             </button>
@@ -125,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Folders */}
       {viewMode === 'chat' && (
-        <div className="px-4 mt-4">
+        <div className="px-4 mt-4 flex-1 overflow-y-auto">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <FolderOpen className="w-6 h-6 text-gray-500 dark:text-gray-400" />
@@ -133,7 +133,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <button 
               onClick={onHistoryView} 
-              className="text-xs text-blue-600 hover:underline"
+              className="text-xs text-orange-600 hover:underline"
             >
               Beheer
             </button>
@@ -143,7 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               onClick={() => onChatFolderSelect(null)}
               className={`w-full text-left px-3 py-2 rounded-lg transition-colors duration-200 ${
                 !currentActiveFolder
-                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 border border-blue-200 dark:border-blue-700'
+                  ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 border border-orange-200 dark:border-orange-700'
                   : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
               }`}
             >
@@ -160,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => onChatFolderSelect(folder.id)}
                   className={`w-full text-left px-3 py-2 rounded-lg transition-colors duration-200 ${
                     currentActiveFolder?.id === folder.id
-                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 border border-blue-200 dark:border-blue-700'
+                      ? 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 border border-orange-200 dark:border-orange-700'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300'
                   }`}
                 >
@@ -202,7 +202,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   onClick={() => onChatSelect(chat.id)}
                   className={`w-full text-left p-3 rounded-lg transition-colors duration-200 ${
                     selectedChatId === chat.id
-                      ? 'bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700'
+                      ? 'bg-orange-50 dark:bg-orange-900/30 border border-orange-200 dark:border-orange-700'
                       : 'hover:bg-gray-50 dark:hover:bg-gray-800 border border-transparent'
                   }`}
                 >
