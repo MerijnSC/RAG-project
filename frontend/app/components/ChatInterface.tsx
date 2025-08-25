@@ -170,19 +170,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-6 md:px-12 lg:px-24 xl:px-64 space-y-3">
         {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`flex max-w-xs lg:max-w-md ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-end space-x-2`}>
-              <div className={`rounded-2xl px-4 py-2 ${
-                message.type === 'user'
-                  ? 'bg-orange-600 text-white text-lg rounded-br-md'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-bl-md border border-gray-200 dark:border-gray-700'
-              }`}>
-                <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                <p className={`text-xs mt-1 ${message.type === 'user' ? 'text-orange-100' : 'text-gray-500 dark:text-gray-400'}`}>
-                  {formatTime(message.timestamp)}
-                </p>
+          <div key={message.id}>
+            <div className={`flex ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start`}>
+              {/* Message Content */}
+              <div className={`flex flex-col ${message.type === 'user' ? 'items-end' : 'items-start'}`}>
+                {/* Message Bubble */}
+                <div className={`px-4 py-2 ${
+                  message.type === 'user'
+                    ? 'bg-orange-600 text-white rounded-2xl rounded-tr-sm shadow-lg'
+                    : 'bg-transparent text-gray-900 dark:text-gray-100'
+                }`}>
+                  <p className="text-base leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -190,13 +191,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="flex items-end space-x-2">
-              <div className="w-8 h-8 bg-gray-300 dark:bg-gray-700 rounded-full flex items-center justify-center flex-shrink-0">
-                <Snail className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-              </div>
-              <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-md border border-gray-200 dark:border-gray-700 px-4 py-3">
-                <div className="flex items-center space-x-2">
-                  <Loader2 className="w-4 h-4 animate-spin text-gray-500 dark:text-gray-400" />
+            <div className="flex items-start max-w-xs lg:max-w-2xl">
+              {/* Typing Indicator */}
+              <div className="bg-transparent">
+                <div className="flex items-center space-x-2 px-4 py-3">
+                  <Loader2 className="w-4 h-4 animate-spin text-orange-600" />
+
+
                   <span className="text-sm text-gray-500 dark:text-gray-400">AI denkt na...</span>
                 </div>
               </div>

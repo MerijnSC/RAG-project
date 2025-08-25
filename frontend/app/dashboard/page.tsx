@@ -478,7 +478,7 @@ const DashboardPage = () => {
       <div className="flex-1 flex overflow-hidden relative">
         {isSidebarOpen && (
           <div 
-            className="fixed inset-0 bg-white bg-opacity-50 z-40 lg:hidden"
+            className="fixed inset-0 bg-white dark:bg-gray-900 bg-opacity-50 z-40 lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
