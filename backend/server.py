@@ -20,7 +20,7 @@ embedding_model = 'intfloat/multilingual-e5-large-instruct'
 
 
 # LLM
-system_prompt = "You are Nextor, a RAG agent that helps navigate documents and provide accurate answers based on information you can retrieve from them. Answer all question based on retrieved information."
+system_prompt = "You are Nextor, a Dutch RAG agent that helps navigate documents and provide accurate answers based on information you can retrieve from them. Answer all question based on retrieved information."
 model = "gpt-5-nano"
 # model = "gpt-5-mini"
 

@@ -87,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Actieve contextmappen */}
       {viewMode === 'chat' && (
-        <div className="px-4 mt-4 flex-1 overflow-y-auto">
+        <div className="px-4 mt-4 flex-1 overflow-y-auto hide-scrollbar">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <File className="w-6 h-6 text-gray-500 dark:text-gray-400" />
@@ -125,7 +125,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Folders */}
       {viewMode === 'chat' && (
-        <div className="px-4 mt-4 flex-1 overflow-y-auto">
+        <div className="px-4 mt-4 flex-1 overflow-y-auto hide-scrollbar">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center space-x-2">
               <FolderOpen className="w-6 h-6 text-gray-500 dark:text-gray-400" />
@@ -179,7 +179,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Recent Chats */}
       {viewMode === 'chat' && (
-        <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 p-4 overflow-y-auto hide-scrollbar">
           <div className="flex items-center space-x-2 mb-4 mt-4">
             <Clock className="w-6 h-6 text-gray-500 dark:text-gray-400" />
             <h2 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">

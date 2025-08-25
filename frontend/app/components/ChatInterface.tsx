@@ -170,7 +170,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 md:px-12 lg:px-24 xl:px-64 space-y-3">
+      <div className="flex-1 overflow-y-auto hide-scrollbar p-6 md:px-12 lg:px-24 xl:px-64 space-y-3">
         {messages.map((message) => (
           <div key={message.id}>
             <div className={`flex ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'} items-start`}>

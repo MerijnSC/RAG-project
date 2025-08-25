@@ -186,7 +186,7 @@ const ChatHistoryViewer = ({
       {/* Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Folders Sidebar */}
-        <div className="w-80 border-r border-gray-200 dark:border-gray-700 overflow-y-auto bg-white dark:bg-gray-900">
+        <div className="w-80 border-r border-gray-200 dark:border-gray-700 overflow-y-auto hide-scrollbar bg-white dark:bg-gray-900">
           <div className="p-4">
             <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-4 uppercase tracking-wide">
               Mappen
@@ -302,7 +302,7 @@ const ChatHistoryViewer = ({
         </div>
 
         {/* Chat List */}
-        <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-900">
+        <div className="flex-1 overflow-y-auto hide-scrollbar bg-white dark:bg-gray-900">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <h2 className="md:text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -396,7 +396,7 @@ const ChatHistoryViewer = ({
       {/* Move chats modal */}
       {isMovingChats && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-h-96 overflow-y-auto shadow-xl">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 max-h-96 overflow-y-auto hide-scrollbar shadow-xl">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Verplaats naar map</h3>
             
             <div className="space-y-2 mb-4">
