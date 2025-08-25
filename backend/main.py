@@ -2,6 +2,7 @@ from chat.core import ChatSession
 from chat.keys import SECRET
 from database import Database
 from openai import OpenAI
+import os
 
 
 
@@ -11,7 +12,7 @@ from openai import OpenAI
 # Database
 top_k = 5
 surrounding_k = 2
-storage_path = "C:\\Users\\mwsch\\iCloudDrive\\python_projects\\rag\\storage"
+storage_path = os.path.join("backend", "storage")
 embedding_model = 'intfloat/multilingual-e5-large-instruct'
 
 
