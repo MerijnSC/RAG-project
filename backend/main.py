@@ -12,16 +12,16 @@ import os
 # Database
 top_k = 5
 surrounding_k = 2
-storage_path = os.path.join("backend", "storage")
+storage_path = os.path.join("storage")
 embedding_model = 'intfloat/multilingual-e5-large-instruct'
 
 
 
 # LLM
 system_prompt = "You are Nextor, a RAG agent that helps navigate documents and provide accurate answers based on information you can retrieve from them. Answer all question based on retrieved information."
-model = "gpt-5-nano"
+# model = "gpt-5-nano"
 # model = "gpt-5-mini"
-
+model = "gpt-5"
 
 
 tools_instructions = [

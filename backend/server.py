@@ -14,7 +14,7 @@ import os
 # Database
 top_k = 5
 surrounding_k = 2
-storage_path = os.path.join("backend", "storage")
+storage_path = os.path.join("storage")
 embedding_model = 'intfloat/multilingual-e5-large-instruct'
 
 
